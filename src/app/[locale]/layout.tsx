@@ -31,7 +31,7 @@ export default async function RootLayout({
   const messages = await getMessages();
   return (
     <html lang={locale}>
-      <body className="bg-cream-bg">
+      <body className="bg-cream-bg font-prompt">
         <NextIntlClientProvider messages={messages}>
           {children}
         </NextIntlClientProvider>
