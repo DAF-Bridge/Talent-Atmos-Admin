@@ -1,10 +1,13 @@
 "use client";
 
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Link } from "@/i18n/routing";
-import { Event } from "@/lib/types";
+import type { Event } from "@/lib/types";
 import { cn, formatDateRange, formatRelativeTime } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 import React from "react";
+import { Calendar, MapPin } from "lucide-react";
+import Image from "next/image";
 
 export default function EventList() {
   // const [events, setEvents] = useState<Event[]>([]);
@@ -183,34 +186,60 @@ export default function EventList() {
   const searchParams = useSearchParams();
   const currentId = searchParams.get("id");
 
+  const isMobile = useIsMobile();
+
   return (
-    <div className="flex flex-col gap-2 mt-2">
+    <div className="flex flex-col gap-3">
       {events.map((event) => (
-        <Link
-          href={`/event-management?id=${event.id}`}
-          key={event.id}
-          className={cn(
-            "border rounded-md p-2 hover:bg-slate-100",
-            currentId === `${event.id}` && "bg-slate-100 border-2 border-primary/60"
-          )}
-        >
-          <div className="flex gap-2 justify-start items-start">
-            <div className="flex flex-col text-left w-full">
-              <div className="flex gap-5 justify-between items-start">
-                <p className="text-sm line-clamp-2">{event.name}</p>
-                <p className="text-xs shrink-0">
-                  {formatRelativeTime(event.startDate)}
-                </p>
+        <div key={event.id}>
+          <Link
+            href={
+              isMobile
+                ? `/event-management/edit/${event.id}`
+                : `/event-management?id=${event.id}`
+            }
+            className={cn(
+              "block border rounded-md p-3 hover:bg-slate-50",
+              currentId === `${event.id}` &&
+                "bg-gray-200 hover:bg-gray-200"
+            )}
+          >
+            <div className="flex gap-3 items-start">
+              <div
+                style={{ aspectRatio: "3 / 4" }}
+                className="w-auto h-[100px] rounded-sm overflow-hidden bg-cover bg-center shrink-0"
+              >
+                <Image
+                  src={event.picUrl}
+                  alt={event.name}
+                  width={100}
+                  height={100}
+                  className="w-full h-full object-cover"
+                />
               </div>
-              <p className="text-xs">
-                {event.startDate
-                  ? formatDateRange(event.startDate, event.endDate)
-                  : "ไม่ระบุ"}
-              </p>
-              <p className="text-xs">{event.location || "ไม่ระบุ"}</p>
+              <div className="flex flex-col text-left w-full">
+                <p className="text-xs font-base text-muted-foreground line-clamp-1">
+                  {"แก้ไขล่าสุด " + formatRelativeTime(event.startDate)}
+                </p>
+                <h3 className="text-sm font-medium mt-0.5 line-clamp-2">
+                  {event.name}
+                </h3>
+                <div className="flex items-center gap-1.5 mt-1.5 text-xs text-gray-600">
+                  <Calendar className="w-3 h-3" />
+                  <p className="line-clamp-1">
+                    {event.startDate
+                      ? formatDateRange(event.startDate, event.endDate)
+                      : "ไม่ระบุ"}
+                  </p>
+                </div>
+                <div className="flex items-center gap-1.5 mt-0.5 text-xs text-gray-600">
+                  <MapPin className="w-3 h-3" />
+                  <p className="line-clamp-1">{event.location || "ไม่ระบุ"}</p>
+                </div>
+              </div>
             </div>
-          </div>
-        </Link>
+          </Link>
+        </div>
       ))}
     </div>
   );
