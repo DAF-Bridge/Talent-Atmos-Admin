@@ -1,7 +1,9 @@
-import React from 'react'
+import React from "react";
 
-export default function JobManagementPage() {
+export default function EventManagementPage() {
   return (
-    <div>JobManagementPage</div>
-  )
+    <div className="line-clamp-2">
+      EventManagementPageEventManagementPageEventManagementPageEventManagementPageEventManagementPageEventManagementPageEventManagementPageEventManagementPageEventManagementPageEventManagementPageEventManagementPageEventManagementPageEventManagementPageEventManagementPageEventManagementPageEventManagementPageEventManagementPageEventManagementPageEventManagementPage
+    </div>
+  );
 }

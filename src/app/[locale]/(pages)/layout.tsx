@@ -1,5 +1,4 @@
-import { AppSidebar } from "@/components/layout/app-sidebar";
-import { Separator } from "@/components/ui/separator";
+import { AppSidebar } from "@/components/layout/sidebar/app-sidebar";
 import {
   SidebarInset,
   SidebarProvider,
@@ -12,15 +11,16 @@ export default function AdminConsoleLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="font-prompt">
+    <div className="h-screen flex">
       <SidebarProvider>
         <AppSidebar />
-        <SidebarInset>
-          <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="mr-2 h-4" />
-          </header>
-          <div className="flex flex-1 flex-col gap-4 p-4">{children}</div>
+        <SidebarInset className="flex-1 min-w-0 p-2 bg-sidebar">
+          <div className="relative flex flex-col h-full rounded-xl bg-white drop-shadow-sm p-4 border">
+            <SidebarTrigger className="absolute top-2 left-2" />
+            <section className="mt-8 flex-1 min-h-0">
+              <div className="w-full break-words h-full">{children}</div>
+            </section>
+          </div>
         </SidebarInset>
       </SidebarProvider>
     </div>
