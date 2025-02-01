@@ -49,7 +49,7 @@ export function DatePickerWithRange({
 
     // Register endDate (optional)
     form.register("endDate");
-  }, [form]);
+  }, [form, errMsg]);
 
   // Set startDate and endDate
   useEffect(() => {

@@ -33,6 +33,13 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { COLORS } from "./colorGrid";
+import { ReactNode } from "react";
+
+interface Option {
+  icon: ReactNode;
+  onClick: () => void;
+  pressed: boolean;
+}
 
 const ColorPicker = ({
   onColorSelect,
@@ -166,16 +173,13 @@ export default function ToolBar({
       pressed: editor.isActive("code"),
     },
     {
-      icon: <Image className="size-4" />,
+      icon: <Image className="size-4" aria-label="Add Image" />,
       onClick: () => addImage(),
       pressed: editor.isActive("image"),
     },
   ];
 
-  const renderOptionGroup = (
-    options: any[],
-    className = ""
-  ) => (
+  const renderOptionGroup = (options: Option[], className = "") => (
     <div className={`flex space-x-1 ${className}`}>
       {options.map((option, i) => (
         <Toggle

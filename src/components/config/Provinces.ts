@@ -1,4 +1,10 @@
-export const provinces = {
+type Regions = "ภาคเหนือ" | "ภาคตะวันออกเฉียงเหนือ" | "ภาคกลาง" | "ภาคตะวันออก" | "ภาคใต้";
+
+type Provinces = {
+  [key in Regions]: string[];
+};
+
+export const provinces: Provinces = {
   ภาคเหนือ: [
     "เชียงใหม่",
     "เชียงราย",
