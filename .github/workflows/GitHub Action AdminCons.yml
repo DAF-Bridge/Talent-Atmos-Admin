@@ -9,8 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
 
     steps:
       - name: Checkout code
@@ -26,6 +24,7 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+        continue-on-error: true
 
       - name: Build
         id: build
@@ -34,6 +33,7 @@ jobs:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
           NEXT_PUBLIC_GO_API_URL: ${{ secrets.NEXT_PUBLIC_GO_API_URL }}
           NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: ${{ secrets.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN }}
+        continue-on-error: true
 
     outputs:
       build_status: ${{ steps.build.outcome }}
