@@ -50,7 +50,7 @@ export function NavMain({
               className={cn(
                 "flex items-center justify-start group-data-[collapsible=icon]:justify-center",
                 " w-full h-[42px] border-transparent",
-                "hover:border-gray-stroke hover:shadow-sm hover:bg-white border-2",
+                "hover:shadow-sm hover:bg-white border-2",
                 path.includes(item.url) && "bg-white border-gray-stroke"
               )}
             >

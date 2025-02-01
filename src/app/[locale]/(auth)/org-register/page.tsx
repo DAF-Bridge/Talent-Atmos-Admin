@@ -106,7 +106,10 @@ export default function OrgRegisterPage() {
   return (
     <div className="flex min-h-screen items-center justify-center px-6 pt-4 mb-16 max-w-[800px] mx-auto">
       <Card className="relative w-full">
-        <Link href="/dashboard" className="absolute flex items-center gap-2 top-2 left-2 hover:bg-slate-100 pr-2 py-1 rounded-md">
+        <Link
+          href="/dashboard"
+          className="absolute flex items-center gap-2 top-2 left-2 hover:bg-slate-100 pr-2 py-1 rounded-md"
+        >
           <ChevronLeft />
           <span>Back</span>
         </Link>
@@ -197,7 +200,9 @@ export default function OrgRegisterPage() {
               <Label htmlFor="headline">Headline</Label>
               <Input
                 id="headline"
-                {...register("headline", { required: "Headline is required" })}
+                {...register("headline", {
+                  required: "Headline is required",
+                })}
               />
               {errors.headline && (
                 <p className="text-sm text-red-500 mt-1">
@@ -262,9 +267,7 @@ export default function OrgRegisterPage() {
                         <SelectValue placeholder="Select a province" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="california">California</SelectItem>
-                        <SelectItem value="texas">Texas</SelectItem>
-                        <SelectItem value="florida">Florida</SelectItem>
+                        <SelectItem value="TH">Thai</SelectItem>
                       </SelectContent>
                     </Select>
                   )}
@@ -305,7 +308,12 @@ export default function OrgRegisterPage() {
               <p className="text-base font-medium">Map Coordinate</p>
               <div className="grid grid-cols-2 gap-5">
                 <div>
-                  <Label htmlFor="latitude">Latitude</Label>
+                  <Label
+                    htmlFor="latitude"
+                    className="text-xs text-muted-foreground"
+                  >
+                    Latitude
+                  </Label>
                   <Input
                     id="latitude"
                     {...register("latitude", {
@@ -323,7 +331,12 @@ export default function OrgRegisterPage() {
                   )}
                 </div>
                 <div>
-                  <Label htmlFor="longitude">Longitude</Label>
+                  <Label
+                    htmlFor="longitude"
+                    className="text-xs text-muted-foreground"
+                  >
+                    Longitude
+                  </Label>
                   <Input
                     id="longitude"
                     {...register("longitude", {
@@ -369,6 +382,7 @@ export default function OrgRegisterPage() {
                   type="button"
                   variant="outline"
                   size="sm"
+                  disabled={fields.length >= 4}
                   onClick={() => append({ type: "", url: "" })}
                   className="flex items-center gap-2"
                 >

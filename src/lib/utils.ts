@@ -109,12 +109,22 @@ export const formatTimeRange = (
 
 // convert clock time (e.g., "17:00:00") to ISO string ("0001-01-01T17:00:00.000Z")
 export function convertTimeToISOString(clockTimeAt: string) {
-  const clockTime = new Date(`0001-01-01T${clockTimeAt}Z`);
-  return clockTime.toISOString();
+  if (!clockTimeAt) return "";
+  // Get the current date (today) and append the time
+  const currentDate = new Date();
+  const [hours, minutes] = clockTimeAt.split(":");
+
+  // Set the current date's hours and minutes
+  currentDate.setHours(Number(hours), Number(minutes), 0, 0);
+
+  // Return the ISO string (in UTC format)
+  return currentDate.toISOString();
 }
 
-// convert a date (e.g., "2015-03-25") to ISO string ("2015-03-25T00:00:00.000Z")
+// convert a date (e.g., "Mon Feb 03 2025 00:00:00 GMT+0700 (Indochina Time)") to ISO string ("2025-02-02T17:00:00.000Z")
+// THIS FUNCTION WILL TURN ANY TIME ZONE TO UTC
 export function convertDateToISOString(dateAt: string) {
+  if (!dateAt) return "";
   const DateTime = new Date(dateAt);
   return DateTime.toISOString();
 }

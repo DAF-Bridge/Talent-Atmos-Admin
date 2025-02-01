@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   ResizableHandle,
@@ -10,22 +11,33 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import EventDisplay from "@/features/event-manage/event-display";
 import EventList from "@/features/event-manage/event-list";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Link } from "@/i18n/routing";
 import { Search } from "lucide-react";
 import React from "react";
+import { BiEdit } from "react-icons/bi";
 
 export default function JobManagementPage() {
   const defaultLayout = [35, 65];
   const isMobile = useIsMobile();
   return (
     <ResizablePanelGroup direction="horizontal" className="h-full">
-      <ResizablePanel className="min-w-[250px]" defaultSize={defaultLayout[0]}>
+      <ResizablePanel className="min-w-[250px]" defaultSize={defaultLayout[0]} minSize={25}>
         <div className="h-full overflow-y-auto px-2">
           <Tabs defaultValue="all">
             <div className="flex flex-col justify-start items-start gap-2 pt-4 mb-2">
-              <div className="relative w-full">
-                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Search" className="pl-8" />
+              <div className="flex justify-between items-center gap-2 w-full">
+                <div className="relative w-full">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input placeholder="Search" className="pl-8 " />
+                </div>
+                <Link href={`/event-management/add`}>
+                  <Button>
+                    <BiEdit />
+                    Create
+                  </Button>
+                </Link>
               </div>
+
               <TabsList>
                 <TabsTrigger
                   value="all"
@@ -34,10 +46,10 @@ export default function JobManagementPage() {
                   All
                 </TabsTrigger>
                 <TabsTrigger
-                  value="published"
+                  value="live"
                   className="text-zinc-600 dark:text-zinc-200"
                 >
-                  Published
+                  Live
                 </TabsTrigger>
                 <TabsTrigger
                   value="unpublished"
@@ -46,10 +58,10 @@ export default function JobManagementPage() {
                   Draft
                 </TabsTrigger>
                 <TabsTrigger
-                  value="ended"
+                  value="Past"
                   className="text-zinc-600 dark:text-zinc-200"
                 >
-                  Ended
+                  Past
                 </TabsTrigger>
               </TabsList>
             </div>
@@ -69,7 +81,7 @@ export default function JobManagementPage() {
         className={isMobile ? "hidden" : ""}
       >
         <div className="h-full overflow-y-auto p-2">
-          <EventDisplay/>
+          <EventDisplay />
         </div>
       </ResizablePanel>
     </ResizablePanelGroup>

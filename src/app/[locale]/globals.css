@@ -93,6 +93,27 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+  h1 {
+    @apply text-2xl;
+  }
+  h2 {
+    @apply text-xl;
+  }
+  h3 {
+    @apply text-lg;
+  }
+  h4 {
+    @apply text-base;
+  }
+  h5 {
+    @apply text-sm;
+  }
+  h6 {
+    @apply text-xs;
+  }
+  pre {
+    @apply p-2 bg-foreground text-background rounded-md;
+  }
 }
 
 /* width */
@@ -130,4 +151,8 @@ body {
 html body[data-scroll-locked] {
   overflow: visible !important;
   margin-right: 0 !important;
+}
+
+.error-msg {
+  @apply text-red-500 text-sm before:content-['*'];
 }

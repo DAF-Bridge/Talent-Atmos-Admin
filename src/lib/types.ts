@@ -22,29 +22,29 @@ export type Event = {
 
 export type EventDescriptionProps = {
   event: {
-    id: number;
-    name: string;
-    description: string;
-    startDate: string;
-    endDate?: string;
-    startTime: string;
-    endTime?: string;
+    id: number;//
+    name: string;//
+    description: string;//
+    startDate: string;//
+    endDate?: string;//
+    startTime: string;//
+    endTime?: string;//
     price: string;
-    picUrl: string;
-    highlight: string;
-    requirements: string;
-    outcomes: Array<string>;
-    timeline: Array<{ date: string; content: string }>;
-    benefits: Array<string>;
+    picUrl: string;//
+    highlight: string;//
+    requirements: string;//
+    outcomes: Array<string>;//
+    timeline: Array<{ date: string; content: string }>;//
+    benefits: Array<string>;//
     location: {
-      name: string;
+      name: string;//
       map_url: string;
       image_url: string;
-      lat: number;
-      lng: number;
+      lat: number;//
+      lng: number;//
     };
-    contact: Array<{ type: string; url: string }>;
-    regLink: string;
+    contact: Array<{ type: string; url: string }>;//
+    regLink: string;//
   };
   organization: {
     id: number;

@@ -9,7 +9,7 @@ import {
   // IoPricetagOutline,
   IoTimeOutline,
 } from "react-icons/io5";
-import { BiEdit } from "react-icons/bi";
+import { MdOutlineEdit } from "react-icons/md";
 import { Link } from "@/i18n/routing";
 
 // Mock data
@@ -81,8 +81,8 @@ const EventDisplay = () => {
           ตัวอย่างหน้า
         </p>
         <Link href={`/event-management/edit/${event.id}`}>
-          <Button variant={"default"} size={"lg"}>
-            <BiEdit />
+          <Button variant={"outline"} className="border-primary drop-shadow-md">
+          <MdOutlineEdit />
             Manage Event
           </Button>
         </Link>

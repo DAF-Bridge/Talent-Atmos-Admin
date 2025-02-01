@@ -5,6 +5,7 @@ import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { LanguageCode } from "@/lib/types";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: "Talents Atmos Admin",
@@ -33,6 +34,7 @@ export default async function RootLayout({
     <html lang={locale}>
       <body className="bg-cream-bg font-prompt">
         <NextIntlClientProvider messages={messages}>
+          <Toaster />
           {children}
         </NextIntlClientProvider>
       </body>

@@ -20,7 +20,7 @@ export default function AdminConsoleLayout({
     <div className="h-screen flex">
       <SidebarProvider open={open} onOpenChange={setOpen}>
         <AppSidebar />
-        <SidebarInset className="flex-1 min-w-0 p-2 bg-sidebar">
+        <SidebarInset className="flex-1 min-w-0 p-2 bg-sidebar overflow-y-hidden">
           <div className="relative flex flex-col h-full rounded-xl bg-white drop-shadow-sm p-2 border">
             <div className="flex items-center justify-start border-b pb-1">
               <SidebarTrigger />
