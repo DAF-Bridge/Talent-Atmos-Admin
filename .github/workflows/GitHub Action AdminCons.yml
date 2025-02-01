@@ -1,0 +1,69 @@
+name: Admin Console Web App CI
+
+on:
+  push:
+    branches: [main, develop-did, production]
+  pull_request:
+    branches: [main, production]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{secrets.GH_PAT}}
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.10.0" # Your Node.js version
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        id: build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_GO_API_URL: ${{ secrets.NEXT_PUBLIC_GO_API_URL }}
+          NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: ${{ secrets.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN }}
+
+    outputs:
+      build_status: ${{ steps.build.outcome }}
+
+  notify:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Discord notification
+        run: |
+          BUILD_STATUS="${{ needs.build.outputs.build_status }}"
+
+          if [ "$BUILD_STATUS" != "success" ]; then
+            STAGE="Build"
+            STATUS="failure"
+          fi
+
+          MESSAGE=$(cat <<EOF
+          {
+            "username": "GitHub Actions",
+            "embeds": [{
+              "title": "Workflow $STATUS - $STAGE Stage",
+              "description": "Workflow: ${{ github.workflow }}\nActor: ${{ github.actor }}\nGithub-Commit-Head: ${{ github.sha }}\nBranch: ${{ github.ref_name }}\nRepository: ${{ github.repository }}\nCommit-msg: ${{ github.event.head_commit.message }}\nStatus: $STATUS\n[View Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
+              "color": $(if [ "$STATUS" == "success" ]; then echo "3066993"; else echo "15158332"; fi)
+            }]
+          }
+          EOF
+          )
+
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d "$MESSAGE" \
+            ${{ secrets.DISCORD_WEBHOOK_URL }}
