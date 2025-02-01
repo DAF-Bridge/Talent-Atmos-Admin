@@ -49,6 +49,9 @@ jobs:
           if [ "$BUILD_STATUS" != "success" ]; then
             STAGE="Build"
             STATUS="failure"
+          else
+            STAGE="All"
+            STATUS="success"
           fi
 
           MESSAGE=$(cat <<EOF
