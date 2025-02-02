@@ -8,6 +8,7 @@ import React, {
   ReactNode,
   useMemo,
   useCallback,
+  useRef,
 } from "react";
 import { AuthContextType, UserProfile } from "@/lib/types";
 import { formatExternalUrl } from "@/lib/utils";
@@ -22,21 +23,24 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  // Track whether initial fetch has completed
+  const initialFetchDone = useRef(false);
   const [isAuth, setIsAuth] = useState<boolean | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isHydrated, setIsHydrated] = useState(false); // Track hydration state
+  
+  // Start with hydrated false to prevent flash of content
+  const [isHydrated, setIsHydrated] = useState(false);
 
-  const fetchUserProfile = useCallback(async () => {
+  const fetchUserProfile = useCallback(async (isInitialFetch = false) => {
     try {
       const apiUrl = formatExternalUrl("/current-user-profile");
-
       const response = await fetch(apiUrl, {
-        cache: "no-store", // More aggressive no-cache
+        cache: "no-store",
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include", // Ensures cookies are sent with the request
+        credentials: "include",
       });
 
       if (!response.ok) throw new Error("Unauthorized");
@@ -44,30 +48,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const data: UserProfile = await response.json();
       setUserProfile(data);
       setIsAuth(true);
-      // Set a flag cookie when authentication is successful
       Cookie.set("hasAuth", "true", { path: "/", sameSite: "strict" });
     } catch (err) {
       console.error(err);
       setIsAuth(false);
-      // Remove the flag cookie on authentication failure
+      setUserProfile(null);
       Cookie.remove("hasAuth", { path: "/" });
     } finally {
-      setLoading(false);
+      // Only set loading to false after initial fetch
+      if (isInitialFetch) {
+        setLoading(false);
+        initialFetchDone.current = true;
+      }
     }
   }, []);
 
-  const checkAuthFlag = useCallback(() => {
-    return Cookie.get("hasAuth") === "true";
-  }, []);
-
+  // Initialize auth state
   useEffect(() => {
     const initializeAuth = async () => {
-      // Ensure the component is hydrated
+      // Set hydrated immediately
       setIsHydrated(true);
-
-      // Only fetch if there's an indication of authentication
-      if (checkAuthFlag()) {
-        await fetchUserProfile();
+      
+      // Check if we have an auth cookie
+      const hasAuth = Cookie.get("hasAuth") === "true";
+      
+      if (hasAuth && !initialFetchDone.current) {
+        // Keep previous user profile state while fetching
+        await fetchUserProfile(true);
       } else {
         setIsAuth(false);
         setLoading(false);
@@ -75,11 +82,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     initializeAuth();
-  }, [fetchUserProfile, checkAuthFlag]);
+  }, [fetchUserProfile]);
+
+  // Set up periodic refresh of user profile when authenticated
+  useEffect(() => {
+    if (!isAuth) return;
+
+    const refreshInterval = setInterval(() => {
+      fetchUserProfile(false);
+    }, 5 * 60 * 1000); // Refresh every 5 minutes
+
+    return () => clearInterval(refreshInterval);
+  }, [isAuth, fetchUserProfile]);
 
   const setAuthState = useCallback(async () => {
     setIsAuth(true);
-    fetchUserProfile();
+    await fetchUserProfile(true);
   }, [fetchUserProfile]);
 
   const removeAuthState = useCallback(async () => {
@@ -92,7 +110,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     Cookie.remove("hasAuth", { path: "/" });
   }, []);
 
-  // Wrap the context value in useMemo to avoid unnecessary recalculations
   const contextValue = useMemo(
     () => ({
       isAuth,
@@ -104,9 +121,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     [isAuth, userProfile, loading, setAuthState, removeAuthState]
   );
 
-  // Delay rendering until hydrated
+  // Don't render anything until hydration is complete
   if (!isHydrated) {
-    return null; // Prevent rendering during SSR
+    return null;
+  }
+
+  // Optional: You can also prevent rendering until initial auth check is done
+  if (!initialFetchDone.current && loading) {
+    return null; // or return a loading spinner
   }
 
   return (
