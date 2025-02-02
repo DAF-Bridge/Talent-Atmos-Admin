@@ -6,12 +6,12 @@ export const adminMenu = [
   // Single menu item
   {
     title: "All users",
-    url: "/allusers",
+    url: "/all-users",
     icon: User2,
   },
   {
     title: "All organizations",
-    url: "/allorgs",
+    url: "/all-orgs",
     icon: Building,
     // items: [
     //   { title: "Draft", url: "/org-management/draft" },
@@ -20,7 +20,7 @@ export const adminMenu = [
   },
   {
     title: "All open jobs",
-    url: "/alljobs",
+    url: "/all-jobs",
     icon: Briefcase,
     // items: [
     //   { title: "Draft", url: "/job-management/draft" },
@@ -29,7 +29,7 @@ export const adminMenu = [
   },
   {
     title: "All events",
-    url: "/allevents",
+    url: "/all-events",
     icon: Calendar,
     // items: [
     //   { title: "Draft", url: "/event-management/draft" },

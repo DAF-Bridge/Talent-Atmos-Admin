@@ -107,11 +107,11 @@ export default function OrgRegisterPage() {
     <div className="flex min-h-screen items-center justify-center px-6 pt-4 mb-16 max-w-[800px] mx-auto">
       <Card className="relative w-full">
         <Link
-          href="/dashboard"
+          href="/"
           className="absolute flex items-center gap-2 top-2 left-2 hover:bg-slate-100 pr-2 py-1 rounded-md"
         >
           <ChevronLeft />
-          <span>Back</span>
+          <span>Home</span>
         </Link>
         <CardHeader className="mt-5">
           <CardTitle className="text-2xl font-medium">

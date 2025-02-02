@@ -16,7 +16,7 @@ import { Search } from "lucide-react";
 import React from "react";
 import { BiEdit } from "react-icons/bi";
 
-export default function EventManagementPage() {
+export default function FullJobManagementPage() {
   const defaultLayout = [35, 65];
   const isMobile = useIsMobile();
   return (
@@ -30,7 +30,7 @@ export default function EventManagementPage() {
                   <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input placeholder="Search" className="pl-8 " />
                 </div>
-                <Link href={`/event-management/add`}>
+                <Link href={`/all-events/add`}>
                   <Button>
                     <BiEdit />
                     Create
@@ -81,7 +81,7 @@ export default function EventManagementPage() {
         className={isMobile ? "hidden" : ""}
       >
         <div className="h-full overflow-y-auto p-2">
-          <EventDisplay />
+          <EventDisplay forAdmin />
         </div>
       </ResizablePanel>
     </ResizablePanelGroup>

@@ -7,7 +7,9 @@ import { EventFormValues } from "@/lib/types";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 
-export default function AddEventPage() {
+export default function FullEditEventPage({
+  // params,
+}: Readonly<{ params: { id: string } }>) {
   // const router = useRouter();
   const form = useForm<EventFormValues>({
     defaultValues: {
@@ -31,6 +33,16 @@ export default function AddEventPage() {
     },
   });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  // Fetch event data from the server
+  // React.useEffect(() => {
+  //   const fetchEvent = async () => {
+  //     const res = await fetch(`/api/event/${params.id}`);
+  //     const data = await res.json();
+  //     form.reset(data);
+  //   };
+  //   fetchEvent();
+  // }, []);
 
   const onSubmit = async (data: EventFormValues) => {
     if (!data.picUrl) {
@@ -65,7 +77,7 @@ export default function AddEventPage() {
     <EventFormPage
       form={form}
       onSubmit={onSubmit}
-      isEditing={false}
+      isEditing={true}
       isDialogOpen={isDialogOpen}
       setIsDialogOpen={setIsDialogOpen}
     />

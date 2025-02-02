@@ -1,8 +1,7 @@
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
-
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -13,14 +12,12 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import React from "react";
-import {
-  ChevronsUpDown,
-} from "lucide-react";
+import { ChevronsUpDown } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
-export default function NavUser({
-  // state,
-}: Readonly<{ state: "collapsed" | "expanded" }>) {
+export default function NavUser() {
   const { isMobile } = useSidebar();
+  const { userProfile, removeAuthState } = useAuth();
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -31,12 +28,19 @@ export default function NavUser({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-full">
-                {/* <AvatarImage src={user.avatar} alt={user.name} /> */}
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarImage
+                  src={userProfile?.PicUrl}
+                  alt={userProfile?.FirstName}
+                />
+                <AvatarFallback className="rounded-lg">
+                  {userProfile?.FirstName[0] + "" + userProfile?.LastName[0]}
+                </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{"John Doe"}</span>
-                <span className="truncate text-xs">{"email@gmail.com"}</span>
+                <span className="truncate font-semibold">
+                  {userProfile?.FirstName + " " + userProfile?.LastName}
+                </span>
+                <span className="truncate text-xs">{userProfile?.Email}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -51,9 +55,9 @@ export default function NavUser({
             <DropdownMenuItem>
               <span>Setting</span>
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <span>Sign out</span>
-            </DropdownMenuItem>
+            <button onClick={removeAuthState} className="w-full">
+              <DropdownMenuItem>Sign out</DropdownMenuItem>
+            </button>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

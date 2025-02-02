@@ -1,3 +1,5 @@
+"use client";
+
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -5,9 +7,69 @@ import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import Link from "next/link";
 import LangSwitcher from "@/components/common/LangSwitcher";
+import { FieldValues, useForm } from "react-hook-form";
+import { formatExternalUrl } from "@/lib/utils";
+import { toast } from "@/hooks/use-toast";
+import { useRouter } from "@/i18n/routing";
+import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
   const t = useTranslations("HomePage");
+  const { setAuthState } = useAuth();
+  const router = useRouter();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const OnSubmit = async (data: FieldValues) => {
+    try {
+      const apiUrl = formatExternalUrl("/login");
+
+      const res = await fetch(apiUrl, {
+        cache: "no-store",
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include", // Send and receive cookies
+        body: JSON.stringify(data), // Send validated data
+      });
+
+      if (res.ok) {
+        setAuthState();
+        const result = await res.json();
+        console.log(result);
+        toast({
+          title: "Success",
+          description: result.message,
+        });
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 1500);
+      } else {
+        const result = await res.json();
+        toast({
+          title: "Error",
+          variant: "destructive",
+          description: result.error,
+        });
+        console.error(result);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        variant: "destructive",
+        description: "Something went wrong",
+      });
+      console.error(error);
+    }
+  };
+
   return (
     <div className="font-prompt flex min-h-screen flex-col items-center justify-center px-16 -translate-y-7">
       <div className="absolute top-12 right-6">
@@ -26,7 +88,7 @@ export default function LoginPage() {
                 alt="Logo"
               />
               <span className="text-xs font-light text-left text-gray-500 italic mb-4">
-                Organization Management Console
+                Organization CMS Console
               </span>
             </div>
           </h1>
@@ -36,12 +98,19 @@ export default function LoginPage() {
           </p>
         </div>
         <div className="grid gap-6">
-          <form>
+          <form onSubmit={handleSubmit(OnSubmit)}>
             <div className="grid gap-6">
               <div className="grid gap-2">
                 <div>
                   <Label htmlFor="email">Email</Label>
                   <Input
+                    {...register("email", {
+                      required: "Email is required",
+                      pattern: {
+                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                        message: "Invalid email address",
+                      },
+                    })}
                     id="email"
                     placeholder="example@gmail.com"
                     type="email"
@@ -49,10 +118,16 @@ export default function LoginPage() {
                     autoComplete="email"
                     autoCorrect="off"
                   />
+                  {errors.email && (
+                    <p className="error-msg">{errors.email.message}</p>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="password">Password</Label>
                   <Input
+                    {...register("password", {
+                      required: "Password is required",
+                    })}
                     id="password"
                     placeholder="Enter your password"
                     type="password"
@@ -60,9 +135,14 @@ export default function LoginPage() {
                     autoComplete="password"
                     autoCorrect="off"
                   />
+                  {errors.password && (
+                    <p className="error-msg">{errors.password.message}</p>
+                  )}
                 </div>
               </div>
-              <Button>Sign in with Email</Button>
+              <Button type="submit" disabled={isSubmitting}>
+                Sign in with Email
+              </Button>
             </div>
           </form>
           <div className="relative">

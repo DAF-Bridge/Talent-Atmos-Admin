@@ -143,5 +143,12 @@ export const formatGroupNumber = (number: number) => {
   });
 };
 
+export const alphabeticLength = (value: string) => {
+  // Remove HTML tags
+  const textWithoutHtml = value.replace(/<[^>]*>/g, "");
+  // Remove non-alphabetic characters (including spaces)
+  return textWithoutHtml.replace(/[^a-zA-Z]/g, "").length;
+};
+
 // 2024-11-16 00:00:00+00 for database
 // 2024-11-16T00:00:00.000Z for api call

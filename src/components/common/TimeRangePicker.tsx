@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { type UseFormReturn, Controller } from "react-hook-form";
-import type { EventFormValues } from "@/app/[locale]/(pages)/event-management/add/page";
+import { EventFormValues } from "@/lib/types";
 
 const generateTimeOptions = () => {
   const options = [];

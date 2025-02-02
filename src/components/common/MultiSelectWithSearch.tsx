@@ -2,7 +2,8 @@
 import React from "react";
 import MultipleSelector, { Option } from "../ui/MultiSelect";
 import { Controller, UseFormReturn } from "react-hook-form";
-import { EventFormValues } from "@/app/[locale]/(pages)/event-management/add/page";
+import { EventFormValues } from "@/lib/types";
+
 
 const OPTIONS: Option[] = [
   { label: "nextjs", value: "Nextjs" },

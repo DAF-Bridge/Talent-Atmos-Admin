@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/popover";
 import { Label } from "../ui/label";
 import { UseFormReturn } from "react-hook-form";
-import { EventFormValues } from "@/app/[locale]/(pages)/event-management/add/page";
+import { EventFormValues } from "@/lib/types";
 
 interface DatePickerWithRangeProps {
   form: UseFormReturn<EventFormValues>;

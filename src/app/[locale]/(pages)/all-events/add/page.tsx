@@ -7,7 +7,7 @@ import { EventFormValues } from "@/lib/types";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 
-export default function AddEventPage() {
+export default function FullAddEventPage() {
   // const router = useRouter();
   const form = useForm<EventFormValues>({
     defaultValues: {

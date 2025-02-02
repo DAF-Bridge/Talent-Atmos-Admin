@@ -70,25 +70,29 @@ const mockEvent = {
       "https://drive.google.com/uc?export=view&id=1KDX58e7WJ-JqXFV8_a2_2Z1Jalil4M-H",
   },
 };
-
-const EventDisplay = () => {
+  
+const EventDisplay = ({ forAdmin = false }: { forAdmin?: boolean }) => {
   const event = mockEvent;
 
   return (
-    <div className="h-full overflow-y-auto bg-white">
-      <div className="flex justify-between items-center px-4">
+    <div className="h-full overflow-y-auto bg-white min-w-[750px]">
+      <div className="sticky top-0 z-10 bg-white/70 backdrop-blur flex justify-between items-center px-4 pb-2">
         <p className="text-xl font-medium text-center mt-2 p-2 border-l-4 border-orange-500">
           ตัวอย่างหน้า
         </p>
-        <Link href={`/event-management/edit/${event.id}`}>
+        <Link
+          href={`/${forAdmin ? "all-events" : "event-management"}/edit/${
+            event.id
+          }`}
+        >
           <Button variant={"outline"} className="border-primary drop-shadow-md">
-          <MdOutlineEdit />
+            <MdOutlineEdit />
             Manage Event
           </Button>
         </Link>
       </div>
 
-      <div className="p-6">
+      <div className="p-4">
         <div className="flex gap-6 mb-8">
           {/* Left side - Image */}
           <div className="w-[250px] shrink-0">

@@ -28,7 +28,7 @@ export function AppSidebar() {
           <NavMain items={adminMenu} label={adminLabel} />
         </SidebarContent>
         <SidebarFooter>
-          <NavUser state={state} />
+          <NavUser />
         </SidebarFooter>
       </Sidebar>
     </TooltipProvider>
