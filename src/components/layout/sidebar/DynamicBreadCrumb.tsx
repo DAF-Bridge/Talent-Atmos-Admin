@@ -10,11 +10,13 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { useEffect, useState } from "react";
+import { useLocale } from "next-intl";
 
 export function DynamicBreadcrumb() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [mounted, setMounted] = useState(false);
+  const locale = useLocale();
 
   useEffect(() => {
     setMounted(true);
@@ -24,18 +26,18 @@ export function DynamicBreadcrumb() {
     return null; // Return null on the server-side and first render on the client
   }
 
-  // Remove the base path ('/th') and split the remaining path
+  // Remove the base path ('/th' & '/en') and split the remaining path
   const paths = pathname
-    .replace(/^\/th/, "")
+    .replace(/^\/(th|en)/, "")
     .split("/")
-    .filter((path) => path && isNaN(Number(path))) // Filter out numeric segments
+    .filter((path) => path && isNaN(Number(path))); // Filter out numeric segments
 
   // Function to generate href
   const generateHref = (index: number) => {
-    const href = "/th/" + paths.slice(0, index + 1).join("/")
-    const id = searchParams.get("id")
-    return id ? `${href}?id=${id}` : href
-  }
+    const href = `/${locale}/` + paths.slice(0, index + 1).join("/");
+    const id = searchParams.get("id");
+    return id ? `${href}?id=${id}` : href;
+  };
 
   // Function to format breadcrumb item text
   const formatText = (text: string) => {
