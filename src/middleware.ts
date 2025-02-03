@@ -14,7 +14,7 @@ const protectedRoutes = [
   "/org-management",
   "/job-management",
   "/event-management",
-  "/admin"
+  "/admin",
 ];
 
 export async function middleware(req: NextRequest) {
@@ -60,6 +60,7 @@ export async function middleware(req: NextRequest) {
       });
 
       if (!response.ok) {
+        console.warn(`Protected route access denied: ${path}`);
         return NextResponse.redirect(new URL("/signin", req.url));
       }
     } catch (error) {

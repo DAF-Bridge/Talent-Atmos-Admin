@@ -48,14 +48,18 @@ export default function SigninPage() {
       });
 
       if (res.ok) {
+        // Await the full auth state setup
         await setAuthState();
+
         const result = await res.json();
         toast({
           title: "Success",
           description: result,
         });
 
-        await router.push("/dashboard");
+        setTimeout(async () => {
+          await router.push("/dashboard");
+        }, 200);
       } else {
         const result = await res.json();
         toast({
