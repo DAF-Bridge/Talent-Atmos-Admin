@@ -97,7 +97,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const setAuthState = useCallback(async () => {
     setIsAuth(true);
-    await fetchUserProfile(true);
+    fetchUserProfile();
   }, [fetchUserProfile]);
 
   const removeAuthState = useCallback(async () => {

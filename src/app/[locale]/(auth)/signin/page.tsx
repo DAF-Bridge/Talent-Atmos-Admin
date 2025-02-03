@@ -8,14 +8,14 @@ import Image from "next/image";
 import Link from "next/link";
 import LangSwitcher from "@/components/common/LangSwitcher";
 import { FieldValues, useForm } from "react-hook-form";
-import { formatExternalUrl } from "@/lib/utils";
+import { formatInternalUrl } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "@/i18n/routing";
 import { useAuth } from "@/context/AuthContext";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 
-export default function LoginPage() {
+export default function SigninPage() {
   const t = useTranslations("HomePage");
   const [showPassword, setShowPassword] = useState(false);
   const { setAuthState } = useAuth();
@@ -37,7 +37,7 @@ export default function LoginPage() {
 
   const OnSubmit = async (data: FieldValues) => {
     try {
-      const apiUrl = formatExternalUrl("/login");
+      const apiUrl = formatInternalUrl("/api/auth/signin");
 
       const res = await fetch(apiUrl, {
         cache: "no-store",
@@ -50,19 +50,17 @@ export default function LoginPage() {
       if (res.ok) {
         setAuthState();
         const result = await res.json();
-        console.log(result);
         toast({
           title: "Success",
-          description: result.message,
+          description: result,
         });
-
         router.push("/dashboard");
       } else {
         const result = await res.json();
         toast({
           title: "Error",
           variant: "destructive",
-          description: result.error,
+          description: result,
         });
         console.error(result);
       }
