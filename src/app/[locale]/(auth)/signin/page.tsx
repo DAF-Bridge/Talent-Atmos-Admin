@@ -48,13 +48,14 @@ export default function SigninPage() {
       });
 
       if (res.ok) {
-        setAuthState();
+        await setAuthState();
         const result = await res.json();
         toast({
           title: "Success",
           description: result,
         });
-        router.push("/dashboard");
+
+        await router.push("/dashboard");
       } else {
         const result = await res.json();
         toast({
