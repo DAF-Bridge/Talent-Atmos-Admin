@@ -12,9 +12,12 @@ import { formatExternalUrl } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "@/i18n/routing";
 import { useAuth } from "@/context/AuthContext";
+import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
   const t = useTranslations("HomePage");
+  const [showPassword, setShowPassword] = useState(false);
   const { setAuthState } = useAuth();
   const router = useRouter();
   const {
@@ -27,6 +30,10 @@ export default function LoginPage() {
       password: "",
     },
   });
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prevShowPassword) => !prevShowPassword);
+  };
 
   const OnSubmit = async (data: FieldValues) => {
     try {
@@ -48,9 +55,8 @@ export default function LoginPage() {
           title: "Success",
           description: result.message,
         });
-        setTimeout(() => {
-          router.push("/dashboard");
-        }, 1500);
+
+        router.push("/dashboard");
       } else {
         const result = await res.json();
         toast({
@@ -124,17 +130,36 @@ export default function LoginPage() {
                 </div>
                 <div>
                   <Label htmlFor="password">Password</Label>
-                  <Input
-                    {...register("password", {
-                      required: "Password is required",
-                    })}
-                    id="password"
-                    placeholder="Enter your password"
-                    type="password"
-                    autoCapitalize="none"
-                    autoComplete="password"
-                    autoCorrect="off"
-                  />
+                  <div className="relative">
+                    <Input
+                      {...register("password", {
+                        required: "Password is required",
+                      })}
+                      id="password"
+                      placeholder="Enter your password"
+                      type={showPassword ? "text" : "password"}
+                      autoCapitalize="none"
+                      autoComplete="password"
+                      autoCorrect="off"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={togglePasswordVisibility}
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4 text-gray-500" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-gray-500" />
+                      )}
+                    </Button>
+                  </div>
+
                   {errors.password && (
                     <p className="error-msg">{errors.password.message}</p>
                   )}

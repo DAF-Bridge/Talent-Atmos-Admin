@@ -108,6 +108,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsAuth(false);
     setUserProfile(null);
     Cookie.remove("hasAuth", { path: "/" });
+    window.location.reload();
   }, []);
 
   const contextValue = useMemo(

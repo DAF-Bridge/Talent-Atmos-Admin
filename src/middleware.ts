@@ -14,10 +14,7 @@ const protectedRoutes = [
   "/org-management",
   "/job-management",
   "/event-management",
-  "/all-users",
-  "/all-orgs",
-  "/all-jobs",
-  "/all-events",
+  "/admin"
 ];
 
 export async function middleware(req: NextRequest) {
