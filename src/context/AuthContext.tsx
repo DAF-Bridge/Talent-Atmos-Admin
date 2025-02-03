@@ -10,7 +10,7 @@ import React, {
   useCallback,
 } from "react";
 import { AuthContextType, UserProfile } from "@/lib/types";
-import { formatExternalUrl } from "@/lib/utils";
+import { formatExternalUrl, formatInternalUrl } from "@/lib/utils";
 import Cookie from "js-cookie";
 
 const AuthContext = createContext<AuthContextType>({
@@ -83,12 +83,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [fetchUserProfile]);
 
   const removeAuthState = useCallback(async () => {
-    await fetch(formatExternalUrl("/logout"), {
+    await fetch(formatInternalUrl("/api/auth/logout"), {
       method: "POST",
       credentials: "include",
     });
     setIsAuth(false);
+    Cookie.remove("hasAuth", { path: "/" });
     setUserProfile(null);
+    window.location.href = "/";
   }, []);
 
   // Wrap the context value in useMemo to avoid unnecessary recalculations
