@@ -17,7 +17,7 @@ import { useAuth } from "@/context/AuthContext";
 
 export default function NavUser() {
   const { isMobile } = useSidebar();
-  const { userProfile, removeAuthState } = useAuth();
+  const { userProfile, removeAuthState, loading } = useAuth();
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -27,22 +27,38 @@ export default function NavUser() {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-8 w-8 rounded-full">
-                <AvatarImage
-                  src={userProfile?.PicUrl}
-                  alt={userProfile?.FirstName}
-                />
-                <AvatarFallback className="rounded-lg">
-                  {userProfile?.FirstName[0] + "" + userProfile?.LastName[0]}
-                </AvatarFallback>
-              </Avatar>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">
-                  {userProfile?.FirstName + " " + userProfile?.LastName}
-                </span>
-                <span className="truncate text-xs">{userProfile?.Email}</span>
-              </div>
-              <ChevronsUpDown className="ml-auto size-4" />
+              {loading ? (
+                <>
+                  <div className="h-8 w-8 rounded-full animate-pulse bg-gray-200" />
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <div className="h-3 w-32 animate-pulse bg-gray-200"></div>
+                    <div className="h-2.5 w-24 animate-pulse bg-gray-200 mt-1"></div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <Avatar className="h-8 w-8 rounded-full">
+                    <AvatarImage
+                      src={userProfile?.PicUrl}
+                      alt={userProfile?.FirstName}
+                    />
+                    <AvatarFallback className="rounded-lg">
+                      {userProfile?.FirstName[0] +
+                        "" +
+                        userProfile?.LastName[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-semibold">
+                      {userProfile?.FirstName + " " + userProfile?.LastName}
+                    </span>
+                    <span className="truncate text-xs">
+                      {userProfile?.Email}
+                    </span>
+                  </div>
+                  <ChevronsUpDown className="ml-auto size-4" />
+                </>
+              )}
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent

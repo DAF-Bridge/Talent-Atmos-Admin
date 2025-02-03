@@ -34,7 +34,7 @@ export default function JobManagementPage() {
                   <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input placeholder="Search" className="pl-8 " />
                 </div>
-                <Link href={`/event-management/add`}>
+                <Link href={`/job-management/add`}>
                   <Button>
                     <BiEdit />
                     Create
