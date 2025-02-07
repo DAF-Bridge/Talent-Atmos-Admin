@@ -6,7 +6,7 @@ export const mainMenu = [
     // Single menu item
     {
       title: "Members",
-      url: "/employee-management",
+      url: "/team-management",
       icon: User2,
     },
     {

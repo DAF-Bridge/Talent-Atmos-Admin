@@ -55,7 +55,7 @@ export default function OrgSwitcher({
             }`}
             align="start"
           >
-            <Link href="/org-list">
+            <Link href="/my-organizations">
               <DropdownMenuItem className="hover:cursor-pointer">
                 <LuBuilding className="mr-2 h-4 w-4" />
                 <span>Switch Organization</span>

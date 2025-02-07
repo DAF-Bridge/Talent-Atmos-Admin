@@ -15,14 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
-
-type TeamMember = {
-  id: string;
-  name: string;
-  email: string;
-  role: "Owner" | "Moderator";
-  avatarUrl: string;
-};
+import { TeamMember } from "../lib/types";
 
 type EditRoleModalProps = {
   isOpen: boolean;

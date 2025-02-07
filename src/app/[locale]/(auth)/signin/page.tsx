@@ -5,15 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
-import Link from "next/link";
 import LangSwitcher from "@/components/common/LangSwitcher";
 import { FieldValues, useForm } from "react-hook-form";
-import { formatInternalUrl } from "@/lib/utils";
+// import { formatInternalUrl } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "@/i18n/routing";
 import { useAuth } from "@/context/AuthContext";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { formatExternalUrl } from "@/lib/utils";
 
 export default function SigninPage() {
   const t = useTranslations("HomePage");
@@ -35,11 +35,15 @@ export default function SigninPage() {
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
 
+  const handleGoogleLogin = () => {
+    window.location.href = formatExternalUrl("/auth/google");
+  };
+
   const OnSubmit = async (data: FieldValues) => {
     try {
-      const apiUrl = formatInternalUrl("/api/auth/signin");
+      // const apiUrl = formatInternalUrl("/api/auth/signin");
 
-      const res = await fetch(apiUrl, {
+      const res = await fetch("/api/auth/signin", {
         cache: "no-store",
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -49,7 +53,7 @@ export default function SigninPage() {
 
       if (res.ok) {
         // Await the full auth state setup
-        await setAuthState();
+        setAuthState();
 
         const result = await res.json();
         toast({
@@ -57,9 +61,7 @@ export default function SigninPage() {
           description: result,
         });
 
-        setTimeout(async () => {
-          await router.push("/dashboard");
-        }, 200);
+        router.push("/dashboard");
       } else {
         const result = await res.json();
         toast({
@@ -183,8 +185,8 @@ export default function SigninPage() {
               </span>
             </div>
           </div>
-          <Link
-            href="/org-register"
+          <button
+            onClick={handleGoogleLogin}
             className="flex items-center justify-center gap-2 border rounded-md px-4 py-2 hover:bg-accent hover:text-accent-foreground"
           >
             <Image
@@ -194,7 +196,7 @@ export default function SigninPage() {
               alt="google-login"
             />
             <span>Sign in with Google</span>
-          </Link>
+          </button>
         </div>
       </div>
     </div>

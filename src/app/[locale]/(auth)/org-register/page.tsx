@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Plus, Trash2 } from "lucide-react";
+import {  Plus, Trash2 } from "lucide-react";
 import React, { useState } from "react";
 import {
   useForm,
@@ -22,7 +22,7 @@ import {
   FieldError,
 } from "react-hook-form";
 import Image from "next/image";
-import { Link } from "@/i18n/routing";
+// import { Link } from "@/i18n/routing";
 
 export default function OrgRegisterPage() {
   const {
@@ -106,14 +106,14 @@ export default function OrgRegisterPage() {
   return (
     <div className="flex min-h-screen items-center justify-center px-6 pt-4 mb-16 max-w-[800px] mx-auto">
       <Card className="relative w-full">
-        <Link
+        {/* <Link
           href="/"
           className="absolute flex items-center gap-2 top-2 left-2 hover:bg-slate-100 pr-2 py-1 rounded-md"
         >
           <ChevronLeft />
           <span>Home</span>
-        </Link>
-        <CardHeader className="mt-5">
+        </Link> */}
+        <CardHeader className="">
           <CardTitle className="text-2xl font-medium">
             Register Organization{" "}
             <p className="text-sm font-normal text-muted-foreground">

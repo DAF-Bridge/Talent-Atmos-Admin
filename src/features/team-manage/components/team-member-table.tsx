@@ -16,15 +16,18 @@ import {
   DropdownMenuTrigger,
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { ChevronDown } from "lucide-react";
-
-type TeamMember = {
-  id: string;
-  name: string;
-  email: string;
-  role: "Owner" | "Moderator";
-  avatarUrl: string;
-};
+import { TeamMember } from "../lib/types";
 
 type TeamMemberTableProps = {
   members: TeamMember[];
@@ -41,6 +44,7 @@ export function TeamMemberTable({
   const [selectedRoles, setSelectedRoles] = useState<Set<string>>(
     new Set(["Owner", "Moderator"])
   );
+  const [memberToRemove, setMemberToRemove] = useState<TeamMember | null>(null);
 
   const toggleRole = (role: string) => {
     const newSelectedRoles = new Set(selectedRoles);
@@ -55,6 +59,17 @@ export function TeamMemberTable({
   const filteredMembers = members.filter((member) =>
     selectedRoles.has(member.role)
   );
+
+  const handleRemove = (member: TeamMember) => {
+    setMemberToRemove(member);
+  };
+
+  const confirmRemove = () => {
+    if (memberToRemove) {
+      onRemoveMember(memberToRemove.id);
+      setMemberToRemove(null);
+    }
+  };
 
   return (
     <>
@@ -113,7 +128,7 @@ export function TeamMemberTable({
                 </Button>
                 <button
                   className="border-transparent text-red-500 hover:text-red-600 bg-transparent hover:bg-transparent"
-                  onClick={() => onRemoveMember(member.id)}
+                  onClick={() => handleRemove(member)}
                 >
                   Remove
                 </button>
@@ -134,6 +149,39 @@ export function TeamMemberTable({
           //   onRemoveMember={onRemoveMember}
         />
       )}
+      <AlertDialog
+        open={!!memberToRemove}
+        onOpenChange={() => setMemberToRemove(null)}
+      >
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader className="space-y-3">
+            <AlertDialogTitle className="text-lg font-semibold">
+              Are you sure?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-base">
+              This will remove{" "}
+              <span className="font-medium text-foreground">
+                {memberToRemove?.name}
+              </span>{" "}
+              from the team?
+              <p className="mt-1 text-sm font-light italic text-muted-foreground">
+                (This action cannot be undone.)
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-4">
+            <AlertDialogCancel className="w-full sm:w-auto">
+              Keep Member
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmRemove}
+              className="w-full bg-destructive hover:bg-destructive/90 sm:w-auto"
+            >
+              Remove Member
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

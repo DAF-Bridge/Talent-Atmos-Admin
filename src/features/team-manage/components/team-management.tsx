@@ -5,14 +5,7 @@ import { SearchBar } from "./search-bar";
 import { AddMemberModal } from "./add-member-modal";
 import { Button } from "@/components/ui/button";
 import { TeamMemberTable } from "./team-member-table";
-
-type TeamMember = {
-  id: string;
-  name: string;
-  email: string;
-  role: "Owner" | "Moderator";
-  avatarUrl: string;
-};
+import { TeamMember } from "../lib/types";
 
 const initialMembers: TeamMember[] = [
   {
@@ -69,7 +62,7 @@ export function TeamManagement() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-4 gap-4">
         <SearchBar onSearch={setSearchTerm} />
         <Button onClick={() => setIsAddModalOpen(true)}>Add Member</Button>
       </div>

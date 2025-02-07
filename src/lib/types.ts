@@ -22,29 +22,29 @@ export type Event = {
 
 export type EventDescriptionProps = {
   event: {
-    id: number; 
-    name: string; 
-    description: string; 
-    startDate: string; 
-    endDate?: string; 
-    startTime: string; 
-    endTime?: string; 
+    id: number;
+    name: string;
+    description: string;
+    startDate: string;
+    endDate?: string;
+    startTime: string;
+    endTime?: string;
     price: string;
-    picUrl: string; 
-    highlight: string; 
-    requirements: string; 
-    outcomes: Array<string>; 
-    timeline: Array<{ date: string; content: string }>; 
-    benefits: Array<string>; 
+    picUrl: string;
+    highlight: string;
+    requirements: string;
+    outcomes: Array<string>;
+    timeline: Array<{ date: string; content: string }>;
+    benefits: Array<string>;
     location: {
-      name: string; 
+      name: string;
       map_url: string;
       image_url: string;
-      lat: number; 
-      lng: number; 
+      lat: number;
+      lng: number;
     };
-    contact: Array<{ type: string; url: string }>; 
-    regLink: string; 
+    contact: Array<{ type: string; url: string }>;
+    regLink: string;
   };
   organization: {
     id: number;
@@ -127,12 +127,13 @@ export type AuthContextType = {
 };
 
 export type UserProfile = {
-  ID: number;
-  FirstName: string;
-  LastName: string;
-  Email: string;
-  Phone: string;
-  PicUrl: string;
-  UserID: number;
-  Bio: string;
+  id: number; // userID
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  picUrl: string;
+  language: string;
+  role: string;
+  updatedAt: string;
 };

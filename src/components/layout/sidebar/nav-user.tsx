@@ -39,21 +39,21 @@ export default function NavUser() {
                 <>
                   <Avatar className="h-8 w-8 rounded-full">
                     <AvatarImage
-                      src={userProfile?.PicUrl}
-                      alt={userProfile?.FirstName}
+                      src={userProfile?.picUrl}
+                      alt={userProfile?.firstName}
                     />
                     <AvatarFallback className="rounded-lg">
-                      {userProfile?.FirstName[0] +
+                      {userProfile?.firstName[0] +
                         "" +
-                        userProfile?.LastName[0]}
+                        userProfile?.lastName[0]}
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-semibold">
-                      {userProfile?.FirstName + " " + userProfile?.LastName}
+                      {userProfile?.firstName + " " + userProfile?.lastName}
                     </span>
                     <span className="truncate text-xs">
-                      {userProfile?.Email}
+                      {userProfile?.email}
                     </span>
                   </div>
                   <ChevronsUpDown className="ml-auto size-4" />

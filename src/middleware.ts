@@ -10,7 +10,7 @@ const intlMiddleware = createMiddleware(routing);
 // Specify protected routes (including localized versions)
 const protectedRoutes = [
   "/dashboard",
-  "/employee-management",
+  "/team-management",
   "/org-management",
   "/job-management",
   "/event-management",
@@ -22,7 +22,8 @@ export async function middleware(req: NextRequest) {
 
   // Exclude specific file types and paths
   if (
-    /\.(png|jpg|jpeg|svg|gif|webp|ico)$/.test(path) ||
+    path === "/manifest.json" || // Ensure manifest.json is served directly
+    /\.(png|jpg|jpeg|svg|gif|webp|ico)$/.test(path) || // Skip processing for other static file types
     path.startsWith("/_next") ||
     path.startsWith("/api")
   ) {
