@@ -14,8 +14,10 @@ import {
   MapPin,
   Users,
 } from "lucide-react";
+import { useLocale } from "next-intl";
 
 export default function JobList() {
+  const locale = useLocale();
   // const [jobs, setJobs] = useState<jobs[]>([]);
 
   const jobs: Job[] = [
@@ -24,7 +26,7 @@ export default function JobList() {
       UpdatedAt: "2025-02-02 15:49:45.486693+00",
       title: "Software Engineer",
       scope: "Develop and maintain web applications.",
-      prerequisite: ["JavaScript", "React", "Node.js"],
+      industry: ["ไอที", "เทคโนโลยี", "องค์กร"],
       workplace: "hybrid",
       work_type: "fulltime",
       career_stage: "midlevel",
@@ -44,7 +46,6 @@ export default function JobList() {
       UpdatedAt: "2025-02-02 16:10:22.123456+00",
       title: "Marketing Intern",
       scope: "Assist in digital marketing campaigns.",
-      prerequisite: ["SEO", "Social Media", "Content Creation"],
       workplace: "remote",
       work_type: "internship",
       career_stage: "entrylevel",
@@ -56,13 +57,13 @@ export default function JobList() {
       benefits: "Flexible work hours, mentorship, networking opportunities.",
       quantity: 1,
       salary: 0,
+      industry: ["ไอที", "เทคโนโลยี", "องค์กร"],
     },
     {
       id: 3,
       UpdatedAt: "2025-02-02 17:30:10.789012+00",
       title: "Data Analyst",
       scope: "Analyze business data to provide insights.",
-      prerequisite: ["SQL", "Python", "Data Visualization"],
       workplace: "onsite",
       work_type: "fulltime",
       career_stage: "midlevel",
@@ -74,13 +75,13 @@ export default function JobList() {
       benefits: "Annual bonus, health insurance, free gym membership.",
       quantity: 2,
       salary: 85000,
+      industry: ["ไอที", "เทคโนโลยี", "องค์กร"],
     },
     {
       id: 4,
       UpdatedAt: "2025-02-02 18:15:50.654321+00",
       title: "UX/UI Designer",
       scope: "Design user-friendly digital experiences.",
-      prerequisite: ["Figma", "Adobe XD", "User Research"],
       workplace: "hybrid",
       work_type: "fulltime",
       career_stage: "midlevel",
@@ -92,6 +93,7 @@ export default function JobList() {
       benefits: "Remote work flexibility, wellness stipend, stock options.",
       quantity: 1,
       salary: 70000,
+      industry: ["ไอที", "เทคโนโลยี", "องค์กร"],
     },
   ];
   const searchParams = useSearchParams();
@@ -118,7 +120,7 @@ export default function JobList() {
               <div className="flex justify-between items-start">
                 <h3 className="text-lg font-semibold">{job.title}</h3>
                 <span className="text-xs text-muted-foreground">
-                  {"แก้ไขล่าสุด " + formatRelativeTime(job.UpdatedAt)}
+                  {"แก้ไขล่าสุด " + formatRelativeTime(job.UpdatedAt, locale)}
                 </span>
               </div>
               <p className="text-sm text-gray-600 line-clamp-2">
@@ -159,12 +161,12 @@ export default function JobList() {
                 </div>
               </div>
               <div className="flex flex-wrap gap-2 mt-2">
-                {job.prerequisite.map((skill, index) => (
+                {job.industry.map((sector, index) => (
                   <span
                     key={index}
                     className="px-2 py-1 text-xs bg-gray-100 rounded-full"
                   >
-                    {skill}
+                    {sector}
                   </span>
                 ))}
               </div>

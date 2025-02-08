@@ -13,7 +13,8 @@ import { useRouter } from "@/i18n/routing";
 import { useAuth } from "@/context/AuthContext";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { formatExternalUrl } from "@/lib/utils";
+// import { formatExternalUrl } from "@/lib/utils";
+import GoogleLoginBtn from "@/features/auth/GoogleLoginBtn";
 
 export default function SigninPage() {
   const t = useTranslations("HomePage");
@@ -35,9 +36,9 @@ export default function SigninPage() {
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
 
-  const handleGoogleLogin = () => {
-    window.location.href = formatExternalUrl("/auth/google");
-  };
+  // const handleGoogleLogin = () => {
+  //   window.location.href = formatExternalUrl("/auth/google");
+  // };
 
   const OnSubmit = async (data: FieldValues) => {
     try {
@@ -185,18 +186,7 @@ export default function SigninPage() {
               </span>
             </div>
           </div>
-          <button
-            onClick={handleGoogleLogin}
-            className="flex items-center justify-center gap-2 border rounded-md px-4 py-2 hover:bg-accent hover:text-accent-foreground"
-          >
-            <Image
-              src={"/icon/google-icon.svg"}
-              width={20}
-              height={20}
-              alt="google-login"
-            />
-            <span>Sign in with Google</span>
-          </button>
+          <GoogleLoginBtn />
         </div>
       </div>
     </div>

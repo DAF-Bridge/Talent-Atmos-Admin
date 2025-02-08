@@ -8,8 +8,10 @@ import { useSearchParams } from "next/navigation";
 import React from "react";
 import { Calendar, MapPin } from "lucide-react";
 import Image from "next/image";
+import { useLocale } from "next-intl";
 
 export default function EventList() {
+  const locale = useLocale();
   // const [events, setEvents] = useState<Event[]>([]);
 
   const events: Event[] = [
@@ -200,8 +202,7 @@ export default function EventList() {
             }
             className={cn(
               "block border rounded-md p-3 hover:bg-slate-50",
-              currentId === `${event.id}` &&
-                "bg-gray-200 hover:bg-gray-200"
+              currentId === `${event.id}` && "bg-gray-200 hover:bg-gray-200"
             )}
           >
             <div className="flex gap-3 items-start">
@@ -219,7 +220,7 @@ export default function EventList() {
               </div>
               <div className="flex flex-col text-left w-full">
                 <p className="text-xs font-base text-muted-foreground line-clamp-1">
-                  {"แก้ไขล่าสุด " + formatRelativeTime(event.startDate)}
+                  {"แก้ไขล่าสุด " + formatRelativeTime(event.startDate, locale)}
                 </p>
                 <h3 className="text-sm font-medium mt-0.5 line-clamp-2">
                   {event.name}

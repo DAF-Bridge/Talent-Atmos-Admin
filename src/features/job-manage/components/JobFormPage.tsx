@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 
 import { Trash2 } from "lucide-react";
-import MultipleSelector, { Option } from "@/components/ui/MultiSelect";
+// import { Option } from "@/components/ui/MultiSelect";
 import { JobPublishToggle } from "./publish-toggle";
 import {
   Dialog,
@@ -45,24 +45,24 @@ export default function JobFormPage({
   isDialogOpen,
   setIsDialogOpen,
 }: Readonly<JobPageProps>) {
-  const DefaultVal: Option[] = [];
+  // const DefaultVal: Option[] = [];
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    setValue,
-    watch,
+    // setValue,
+    // watch,
   } = form;
 
-  const prerequisiteArr = watch("prerequisite");
-  if (prerequisiteArr && prerequisiteArr.length > 0) {
-    const multiSelectorValues = prerequisiteArr.map((pre) => pre.valueOf());
+  // const prerequisiteArr = watch("prerequisite");
+  // if (prerequisiteArr && prerequisiteArr.length > 0) {
+  //   const multiSelectorValues = prerequisiteArr.map((pre) => pre.valueOf());
 
-    multiSelectorValues.forEach((val) => {
-      DefaultVal.push({ label: val, value: val });
-    });
-  }
+  //   multiSelectorValues.forEach((val) => {
+  //     DefaultVal.push({ label: val, value: val });
+  //   });
+  // }
 
   const validateAndOpenDialog = async () => {
     // Trigger all field validations
@@ -142,7 +142,7 @@ export default function JobFormPage({
             <Label htmlFor="prerequisite" className="sm:text-right mt-2">
               Prerequisite
             </Label>
-            <div>
+            {/* <div>
               <MultipleSelector
                 {...register("prerequisite")}
                 value={DefaultVal}
@@ -168,7 +168,7 @@ export default function JobFormPage({
                   {errors.prerequisite.message as string}
                 </span>
               )}
-            </div>
+            </div> */}
           </div>
 
           <div>

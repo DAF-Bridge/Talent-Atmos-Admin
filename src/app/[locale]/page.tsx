@@ -10,13 +10,14 @@ import FeatureCard from "@/features/landing-page/FeatureCard";
 import Image from "next/image";
 import { Link } from "@/i18n/routing";
 import ContactForm from "@/features/landing-page/ContactForm";
+import LangSwitcher from "@/components/common/LangSwitcher";
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <header className="bg-white shadow-sm">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div className="relative flex justify-start items-start max-w-[150px]">
+          <div className="relative flex justify-start items-start w-[100px] sm:w-[150px]">
             <Image
               src={"/inline-logo.svg"}
               width={1500}
@@ -26,6 +27,7 @@ export default function Home() {
             <span className="absolute -top-1 -right-7 text-xs text-gray-400">CMS</span>
           </div>
           <div className="flex items-center space-x-4">
+            <LangSwitcher />
             <Link
               href="/docs"
               className="text-sm font-medium text-gray-500 hover:text-gray-900"

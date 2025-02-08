@@ -9,18 +9,27 @@ import {
   DollarSign,
   Briefcase,
   Users,
+  BookOpen,
 } from "lucide-react";
 import { MdOutlineEdit } from "react-icons/md";
 import { Link } from "@/i18n/routing";
-import type { Job } from "@/lib/types";
+import type { JobDescriptionPage } from "@/lib/types";
+import { useLocale } from "next-intl";
 
 const JobDisplay = ({ forAdmin = false }: { forAdmin?: boolean }) => {
-  const job: Job = {
+  const locale = useLocale();
+  const job: JobDescriptionPage = {
     id: 1,
-    UpdatedAt: "2025-02-02 15:49:45.486693+00",
+    updatedDate: "2025-02-02 15:49:45.486693+00",
     title: "Software Engineer",
     scope: "Develop and maintain web applications.",
-    prerequisite: ["JavaScript", "React", "Node.js"],
+    prerequisite: [
+      { name: "Advanced JavaScript", url: "/courses/advanced-javascript" },
+      { name: "React Mastery", url: "/courses/react-mastery" },
+      { name: "Node.js Performance", url: "/courses/nodejs-performance" },
+      { name: "TypeScript in Depth", url: "/courses/typescript-in-depth" },
+      { name: "AWS for Developers", url: "/courses/aws-for-developers" },
+    ],
     workplace: "hybrid",
     work_type: "fulltime",
     career_stage: "midlevel",
@@ -34,6 +43,9 @@ const JobDisplay = ({ forAdmin = false }: { forAdmin?: boolean }) => {
       "Health insurance, remote work options, professional development budget.",
     quantity: 3,
     salary: 75000,
+    industry: ["ไอที", "เทคโนโลยี", "องค์กร"],
+    country: "Thailand",
+    province: "Bangkok",
   };
   return (
     <div className="h-full overflow-y-auto bg-white min-w-[750px]">
@@ -93,16 +105,18 @@ const JobDisplay = ({ forAdmin = false }: { forAdmin?: boolean }) => {
             </div>
           </div>
           <div className="flex flex-wrap gap-2 mb-6">
-            {job.prerequisite.map((skill, index) => (
+            {job.industry.map((item, index) => (
               <span
                 key={index}
                 className="px-3 py-1 bg-gray-100 rounded-full text-sm"
               >
-                {skill}
+                {item}
               </span>
             ))}
           </div>
-          <Button className="w-full">Apply for this position</Button>
+          <Button className="w-full bg-orange-500 hover:bg-orange-500/80">
+            Apply for this position
+          </Button>
         </div>
 
         {/* Description Sections */}
@@ -127,9 +141,32 @@ const JobDisplay = ({ forAdmin = false }: { forAdmin?: boolean }) => {
             <p className="text-gray-700">{job.benefits}</p>
           </div>
 
+          <section>
+            <h2 className="text-xl font-semibold mb-4">Prerequisite Courses</h2>
+            <div className="grid grid-cols-1 gap-4">
+              {job.prerequisite.map((course, index) => (
+                <Link href={course.url} key={index} className="bg-white">
+                  <div className="h-full flex flex-col justify-between border rounded-lg p-4 hover:shadow-md">
+                    <div className="flex items-center gap-2 mb-2">
+                      <BookOpen className="text-primary shrink-0" />
+                      <p className="text-lg font-medium line-clamp-1">
+                        {course.name}
+                      </p>
+                    </div>
+                    <p className="text-sm text-gray-600 line-clamp-1">
+                      {course.url}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+
           <div>
             <h2 className="text-xl font-semibold mb-2">Last Updated</h2>
-            <p className="text-gray-700">{formatRelativeTime(job.UpdatedAt)}</p>
+            <p className="text-gray-700">
+              {formatRelativeTime(job.updatedDate, locale)}
+            </p>
           </div>
         </div>
       </div>

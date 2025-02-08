@@ -7,6 +7,7 @@ import { routing } from "@/i18n/routing";
 import { LanguageCode } from "@/lib/types";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/context/AuthContext";
+import GoogleAuthProvider from "@/context/GoogleOAuthProvider";
 
 export const metadata: Metadata = {
   title: "Talents Atmos Admin",
@@ -36,7 +37,9 @@ export default async function RootLayout({
       <body className="bg-cream-bg font-prompt">
         <NextIntlClientProvider messages={messages}>
           <Toaster />
-          <AuthProvider>{children}</AuthProvider>
+          <GoogleAuthProvider>
+            <AuthProvider>{children}</AuthProvider>
+          </GoogleAuthProvider>
         </NextIntlClientProvider>
       </body>
     </html>

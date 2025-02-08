@@ -88,7 +88,25 @@ export type Job = {
   UpdatedAt: string;
   title: string;
   scope: string;
-  prerequisite: string[];
+  workplace: "remote" | "onsite" | "hybrid";
+  work_type: "fulltime" | "parttime" | "volunteer" | "internship";
+  career_stage: "entrylevel" | "midlevel" | "senior";
+  period: string;
+  description: string;
+  hours_per_day: string;
+  qualifications: string;
+  benefits: string;
+  quantity: number;
+  industry: string[];
+  salary: number;
+};
+
+export type JobFormValues = {
+  id: number;
+  UpdatedAt: string;
+  title: string;
+  scope: string;
+  prerequisite: { name: string; url: string }[];
   workplace: "remote" | "onsite" | "hybrid";
   work_type: "fulltime" | "parttime" | "volunteer" | "internship";
   career_stage: "entrylevel" | "midlevel" | "senior";
@@ -99,22 +117,8 @@ export type Job = {
   benefits: string;
   quantity: number;
   salary: number;
-};
-
-export type JobFormValues = {
-  id: number;
-  title: string;
-  prerequisite: string[];
   location: string;
-  workplace: "remote" | "onsite" | "hybrid";
-  work_type: "fulltime" | "parttime" | "volunteer" | "internship";
-  career_stage: "entrylevel" | "midlevel" | "senior";
-  period: string;
-  description: string;
-  qualifications: string;
   responsibilities: string;
-  quantity: number;
-  salary: number;
   status: "draft" | "published" | "";
 };
 
@@ -137,3 +141,31 @@ export type UserProfile = {
   role: string;
   updatedAt: string;
 };
+
+export interface JobCardProps {
+  id: number;
+  title: string;
+  description: string;
+  work_type: string;
+  workplace: string;
+  career_stage: string;
+  province: string;
+  country: string;
+  salary: number;
+  imgUrl?: string;
+  updatedDate: string;
+  orgName?: string;
+  industry: string[];
+  isBooked?: boolean;
+}
+
+export interface JobDescriptionPage extends JobCardProps {
+  scope: string;
+  prerequisite: { name: string; url: string }[];
+  workplaceDesc?: string;
+  hours_per_day: string;
+  qualifications: string;
+  benefits: string;
+  quantity: number;
+  period: string;
+}
