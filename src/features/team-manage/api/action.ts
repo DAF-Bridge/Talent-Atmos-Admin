@@ -117,3 +117,24 @@ export async function removeMember(orgId: string, body: { user_id: string }) {
     return { success: false, error: data.error, status: res.status };
   }
 }
+
+export async function inviteCallback(token: string) {
+  const apiUrl = formatExternalUrl(`/callback-invitation?token=${token}`);
+  console.log(apiUrl);
+  const res = await fetch(apiUrl, {
+    cache: "no-store",
+    method: "GET",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (res.ok) {
+    return { success: true, status: res.status };
+  } else {
+    const data = await res.json();
+    console.error("API Error:", data);
+    return { success: false, error: data.error, status: res.status };
+  }
+}

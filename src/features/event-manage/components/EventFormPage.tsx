@@ -342,6 +342,7 @@ export default function EventFormPage({
               <div className="mt-4">
                 <Label>Categories</Label>
                 <GenericMultipleSelector
+                  maxSelected={5}
                   form={form}
                   errMessage={eventErrMsg.categories.required}
                   name="categories"

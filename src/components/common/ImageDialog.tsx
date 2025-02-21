@@ -3,7 +3,6 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogOverlay,
   DialogPortal,
   DialogTrigger,
 } from "../ui/dialog";
@@ -21,8 +20,7 @@ export default function ImageDialog({
         </button>
       </DialogTrigger>
       <DialogPortal>
-        <DialogOverlay />
-        <DialogContent>
+        <DialogContent className="bg-transparent border-none">
           <Image src={imgUrl ?? ""} alt="" width={1000} height={1000} />
           <DialogClose />
         </DialogContent>

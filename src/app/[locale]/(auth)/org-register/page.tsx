@@ -36,12 +36,14 @@ import {
 import { provinces } from "@/components/config/Provinces";
 import { useLocale } from "next-intl";
 import { createOrg } from "@/features/organization/api/action";
+import ImageDialog from "@/components/common/ImageDialog";
 
 export default function OrgRegisterPage() {
   const locale = useLocale();
   const form = useForm({
     defaultValues: {
       logo: "",
+      background_image: "",
       email: "",
       name: "",
       headline: "",
@@ -65,6 +67,7 @@ export default function OrgRegisterPage() {
     formState: { errors, isSubmitting },
     setValue,
     setError,
+    watch,
     clearErrors,
   } = form;
 
@@ -76,6 +79,9 @@ export default function OrgRegisterPage() {
   });
 
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [backgroundPreview, setBackgroundPreview] = useState<string | null>(
+    null
+  );
 
   const fetchIndustries = async (value: string): Promise<Option[]> => {
     try {
@@ -133,15 +139,21 @@ export default function OrgRegisterPage() {
     const formData = new FormData();
 
     // Exclude `logo` from `data`
-    const { logo, ...otherData } = data;
+    const { logo, background_image, ...otherData } = data;
 
     // create image file from base64 string
-    const uniqueFilename = `org_${Date.now()}.png`;
-    const imgFile = base64ToFile(logo, uniqueFilename);
+    const logoFile = base64ToFile(logo, `org_logo_${Date.now()}.png`);
+    const backgroundFile = base64ToFile(
+      background_image,
+      `org_bg_${Date.now()}.png`
+    );
 
     // Append image to FormData
-    if (imgFile instanceof File) {
-      formData.append("image", imgFile);
+    if (logoFile instanceof File) {
+      formData.append("image", logoFile);
+    }
+    if (backgroundFile instanceof File) {
+      formData.append("background_image", backgroundFile);
     }
 
     // construct json from other data fields exclude image
@@ -184,13 +196,16 @@ export default function OrgRegisterPage() {
     }
   };
 
-  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    field: "logo" | "background_image"
+  ) => {
     const file = e.target.files?.[0];
 
     if (file) {
       // Validate file size (max 10MB) and type (JPEG/PNG)
       if (file.size > 10 * 1024 * 1024) {
-        setError("logo", {
+        setError(field, {
           type: "manual",
           message: "File size must be less than 10MB",
         });
@@ -198,7 +213,7 @@ export default function OrgRegisterPage() {
       }
 
       if (!["image/jpeg", "image/png"].includes(file.type)) {
-        setError("logo", {
+        setError(field, {
           type: "manual",
           message: "Only JPEG and PNG files are allowed",
         });
@@ -206,21 +221,37 @@ export default function OrgRegisterPage() {
       }
 
       // If validation passes, clear previous errors
-      clearErrors("logo");
+      clearErrors(field);
 
       const reader = new FileReader();
       reader.onload = () => {
         const fileString = reader.result as string;
-        setValue("logo", fileString); // Update the form's logo value
-        setLogoPreview(fileString); // Set image preview
+        setValue(field, fileString); // Update the form's value
+        if (field === "logo") {
+          setLogoPreview(fileString); // Set logo preview
+        } else {
+          setBackgroundPreview(fileString); // Set background preview
+        }
       };
       reader.readAsDataURL(file);
     } else {
-      setError("logo", {
+      setError(field, {
         type: "manual",
         message: "Please select a valid file",
       });
     }
+  };
+
+  const handleUploadImage = (field: "logo" | "background_image") => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/jpeg,image/png";
+    input.onchange = (e: Event) =>
+      handleImageChange(
+        e as unknown as React.ChangeEvent<HTMLInputElement>,
+        field
+      );
+    input.click();
   };
 
   return (
@@ -236,9 +267,73 @@ export default function OrgRegisterPage() {
         </CardHeader>
         <CardContent className="flex flex-col gap-5">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div className="flex justify-start items-center gap-5">
+            <div>
+              {backgroundPreview ? (
+                <div
+                  style={{ aspectRatio: "12/2" }}
+                  className="rounded-sm overflow-hidden w-full drop-shadow-md border group mt-1"
+                >
+                  <div className="absolute top-1 right-1 transform z-50 invisible group-hover:visible">
+                    <button
+                      onClick={() => handleUploadImage("background_image")}
+                      type="button"
+                      className="text-sm text-white text-medium bg-black/40 hover:bg-black/80 px-4 py-[6px] rounded-md"
+                    >
+                      Change File
+                    </button>
+                  </div>
+
+                  <div className="invisible group-hover:visible absolute top-1 left-1 transform z-50">
+                    <ImageDialog imgUrl={backgroundPreview} />
+                  </div>
+
+                  <Image
+                    style={{ aspectRatio: "12/2" }}
+                    src={backgroundPreview}
+                    alt="background"
+                    className="object-cover"
+                    width={1200}
+                    height={200}
+                  />
+                </div>
+              ) : (
+                <div
+                  className="bg-white text-gray-400 flex flex-col text-center items-center 
+                justify-center rounded-sm w-full h-auto border"
+                  style={{ aspectRatio: "12/2" }}
+                >
+                  <p className="text-sm mt-2">Upload Background</p>
+                  <span className="text-xs mt-1 text-muted-foreground">
+                    {"1200x200px (Max 10 MB)"}
+                  </span>
+
+                  <button
+                    onClick={() => handleUploadImage("background_image")}
+                    type="button"
+                    className="mt-2 text-sm text-white text-medium bg-black px-4 py-[6px] rounded-md"
+                  >
+                    Choose File
+                  </button>
+                  <input
+                    {...register("background_image", {
+                      required: "background is required",
+                    })}
+                    type="file"
+                    className="hidden"
+                    accept="image/jpeg,image/png"
+                    onChange={(e) => handleImageChange(e, "background_image")}
+                  />
+                  {errors.background_image && (
+                    <p className="error-msg">
+                      {errors.background_image.message}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+            <div className="flex justify-center items-start gap-2">
               {logoPreview ? (
-                <div className="rounded-full overflow-hidden h-[100px] w-[100px] drop-shadow-md">
+                <div className="rounded-lg overflow-hidden h-[200px] w-[200px] drop-shadow-md group border">
                   <Image
                     src={logoPreview}
                     alt="Logo"
@@ -247,28 +342,51 @@ export default function OrgRegisterPage() {
                     width={500}
                     height={500}
                   />
+                  <div className="absolute top-1 right-1 transform z-50 invisible group-hover:visible">
+                    <button
+                      onClick={() => handleUploadImage("logo")}
+                      type="button"
+                      className="text-sm text-white text-medium bg-black/40 hover:bg-black/80 px-4 py-[6px] rounded-md"
+                    >
+                      Change File
+                    </button>
+                  </div>
+                  <div className="invisible group-hover:visible absolute top-1 left-1 transform z-50">
+                    <ImageDialog imgUrl={logoPreview} />
+                  </div>
                 </div>
               ) : (
                 <div
-                  className="bg-gray-200 rounded-full h-[100px] w-[100px]"
+                  className="bg-white text-gray-400 flex flex-col text-center items-center 
+                justify-center rounded-lg h-[200px] w-[200px] border"
                   style={{ aspectRatio: "1/1" }}
-                ></div>
+                >
+                  <p className="text-sm mt-2">Upload Logo</p>
+                  <span className="text-xs mt-1 text-muted-foreground">
+                    {"500x500px"}
+                  </span>
+                  <span className="text-xs mt-1 text-muted-foreground">
+                    {"(Max 10 MB)"}
+                  </span>
+                  <button
+                    onClick={() => handleUploadImage("logo")}
+                    type="button"
+                    className="mt-2 text-sm text-white text-medium bg-black px-4 py-[6px] rounded-md"
+                  >
+                    Choose File
+                  </button>
+                  <input
+                    {...register("logo", { required: "Logo is required" })}
+                    type="file"
+                    className="hidden"
+                    accept="image/jpeg,image/png"
+                    onChange={(e) => handleImageChange(e, "logo")}
+                  />
+                  {errors.logo && (
+                    <p className="error-msg mt-1">{errors.logo.message}</p>
+                  )}
+                </div>
               )}
-              <div>
-                <Input
-                  type="file"
-                  className="max-w-[250px] cursor-pointer"
-                  accept="image/jpeg,image/png"
-                  onChange={handleLogoChange}
-                />
-                <input
-                  type="hidden"
-                  {...register("logo", { required: "Logo is required" })}
-                />
-                {errors.logo && (
-                  <p className="error-msg mt-1">{errors.logo.message}</p>
-                )}
-              </div>
             </div>
 
             <div>
@@ -287,6 +405,10 @@ export default function OrgRegisterPage() {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                     message: "Invalid email address",
                   },
+                  maxLength: {
+                    value: 100,
+                    message: "Email must be less than 100 characters",
+                  },
                 })}
               />
               {errors.email && (
@@ -294,21 +416,28 @@ export default function OrgRegisterPage() {
               )}
             </div>
 
-            <div>
+            <div className="relative">
               <Label htmlFor="name">Organization Name</Label>
               <Input
                 id="name"
                 placeholder="Enter your organization name"
                 {...register("name", {
                   required: "Organization name is required",
+                  maxLength: {
+                    value: 150,
+                    message: "Name must be less than 150 characters",
+                  },
                 })}
               />
               {errors.name && (
                 <p className="error-msg mt-1">{errors.name.message}</p>
               )}
+              <div className="absolute right-0 text-[10px] text-muted-foreground mt-1">
+                {watch("name").length}/150
+              </div>
             </div>
 
-            <div>
+            <div className="relative">
               <Label htmlFor="headline">
                 <span>Headline</span>
                 <span className="text-xs text-muted-foreground font-light">
@@ -320,14 +449,21 @@ export default function OrgRegisterPage() {
                 placeholder="eg. Startup Incubation Platform, etc."
                 {...register("headline", {
                   required: "Headline is required",
+                  maxLength: {
+                    value: 200,
+                    message: "Headline must be less than 200 characters",
+                  },
                 })}
               />
               {errors.headline && (
                 <p className="error-msg mt-1">{errors.headline.message}</p>
               )}
+              <div className="absolute right-0 text-[10px] text-muted-foreground mt-1">
+                {watch("headline").length}/200
+              </div>
             </div>
 
-            <div>
+            <div className="relative">
               <Label htmlFor="specialty">
                 <span>Specialty</span>
                 <span className="text-xs text-muted-foreground font-light">
@@ -339,16 +475,29 @@ export default function OrgRegisterPage() {
                 placeholder="eg. Elderly Care, Social Work, etc."
                 {...register("specialty", {
                   required: "Specialty is required",
+                  maxLength: {
+                    value: 250,
+                    message: "Specialty must be less than 250 characters",
+                  },
                 })}
               />
               {errors.specialty && (
                 <p className="error-msg mt-1">{errors.specialty.message}</p>
               )}
+              <div className="absolute right-0 text-[10px] text-muted-foreground mt-1">
+                {watch("specialty").length}/250
+              </div>
             </div>
 
             <div>
-              <Label>Industries</Label>
+              <Label>
+                <span>Industries</span>
+                <span className="text-xs text-muted-foreground font-light">
+                  {" (Up to 5)"}
+                </span>
+              </Label>
               <GenericMultipleSelector
+                maxSelected={5}
                 form={form}
                 errMessage={"Industries is required"}
                 name="industries"
@@ -359,18 +508,25 @@ export default function OrgRegisterPage() {
               )}
             </div>
 
-            <div>
+            <div className="relative">
               <Label htmlFor="description">Description</Label>
               <Textarea
                 id="description"
                 placeholder="Enter your organization description"
                 {...register("description", {
                   required: "Description is required",
+                  maxLength: {
+                    value: 5000,
+                    message: "Description must be less than 5000 characters",
+                  },
                 })}
               />
               {errors.description && (
                 <p className="error-msg mt-1">{errors.description.message}</p>
               )}
+              <div className="absolute right-0 text-[10px] text-muted-foreground mt-1">
+                {watch("description").length}/5000
+              </div>
             </div>
 
             <div>
@@ -378,7 +534,13 @@ export default function OrgRegisterPage() {
               <Textarea
                 id="address"
                 placeholder="Enter your organization address"
-                {...register("address", { required: "Address is required" })}
+                {...register("address", {
+                  required: "Address is required",
+                  maxLength: {
+                    value: 500,
+                    message: "Address must be less than 500 characters",
+                  },
+                })}
               />
               {errors.address && (
                 <p className="error-msg mt-1">{errors.address.message}</p>

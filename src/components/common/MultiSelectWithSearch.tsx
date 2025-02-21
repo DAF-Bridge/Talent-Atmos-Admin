@@ -9,6 +9,7 @@ interface MultipleSelectorProps<T extends FieldValues> {
   name: Path<T>;
   errMessage?: string;
   onSearch: (value: string) => Promise<Option[]>;
+  maxSelected: number;
 }
 
 const GenericMultipleSelector = <T extends FieldValues>({
@@ -16,6 +17,7 @@ const GenericMultipleSelector = <T extends FieldValues>({
   name,
   errMessage = "This field is required",
   onSearch,
+  maxSelected,
 }: MultipleSelectorProps<T>) => {
   return (
     <div className="flex w-full flex-col gap-5">
@@ -25,6 +27,7 @@ const GenericMultipleSelector = <T extends FieldValues>({
         rules={{ required: errMessage }}
         render={({ field }) => (
           <MultipleSelector
+            maxSelected={maxSelected}
             onSearch={async (value) => {
               const res = await onSearch(value);
               return res;
