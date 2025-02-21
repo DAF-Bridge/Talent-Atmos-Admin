@@ -94,11 +94,11 @@ export function convertTimeToISOString(clockTimeAt: string) {
 
 // convert a date (e.g., "Mon Feb 03 2025 00:00:00 GMT+0700 (Indochina Time)") to ISO string ("2025-02-02T17:00:00.000Z")
 // THIS FUNCTION WILL TURN ANY TIME ZONE TO UTC
-export function convertDateToISOString(dateAt: string) {
-  if (!dateAt) return "";
-  const DateTime = new Date(dateAt);
-  return DateTime.toISOString();
-}
+// export function convertDateToISOString(dateAt: string) {
+//   if (!dateAt) return "";
+//   const DateTime = new Date(dateAt);
+//   return DateTime.toISOString();
+// }
 
 export const formatPrice = (price: number) => {
   return price.toLocaleString("en-US", {
@@ -123,3 +123,27 @@ export const alphabeticLength = (value: string) => {
 
 // 2024-11-16 00:00:00+00 for database
 // 2024-11-16T00:00:00.000Z for api call
+
+
+export function base64ToFile(base64String: string, filename: string): File {
+  const arr = base64String.split(",");
+  if (arr.length !== 2) {
+    throw new Error("Invalid Base64 format");
+  }
+
+  const mimeMatch = RegExp(/:(.*?);/).exec(arr[0]);
+  if (!mimeMatch) {
+    throw new Error("Cannot determine file MIME type");
+  }
+
+  const mime = mimeMatch[1]; // Extract MIME type (e.g., image/png, application/pdf)
+  const bstr = atob(arr[1]); // Decode Base64
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+
+  return new File([u8arr], filename, { type: mime });
+}
