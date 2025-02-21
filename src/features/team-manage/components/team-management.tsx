@@ -1,63 +1,127 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SearchBar } from "./search-bar";
 import { AddMemberModal } from "./add-member-modal";
 import { Button } from "@/components/ui/button";
 import { TeamMemberTable } from "./team-member-table";
 import { TeamMember } from "../lib/types";
-
-const initialMembers: TeamMember[] = [
-  {
-    id: "1",
-    name: "John Doe",
-    email: "john@example.com",
-    role: "Owner",
-    avatarUrl: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: "2",
-    name: "Jane Smith",
-    email: "jane@example.com",
-    role: "Moderator",
-    avatarUrl: "/placeholder.svg?height=40&width=40",
-  },
-  // Add more dummy data as needed
-];
+import { toast } from "@/hooks/use-toast";
+import {
+  editUserRole,
+  fetchOrgMembers,
+  inviteUser,
+  removeMember,
+} from "../api/action";
 
 export function TeamManagement() {
-  const [members, setMembers] = useState<TeamMember[]>(initialMembers);
+  const [members, setMembers] = useState<TeamMember[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isFetchingMembers, setIsFetchingMembers] = useState(false);
 
   const filteredMembers = members.filter(
     (member) =>
-      member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      member.email.toLowerCase().includes(searchTerm.toLowerCase())
+      member.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      member.user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleAddMember = (email: string) => {
-    const newMember: TeamMember = {
-      id: (members.length + 1).toString(),
-      name: email.split("@")[0], // Use part of email as name for demo
-      email,
-      role: "Moderator",
-      avatarUrl: "/placeholder.svg?height=40&width=40",
-    };
-    setMembers([...members, newMember]);
-    setIsAddModalOpen(false);
+  const handleFetchOrgMembers = async () => {
+    setIsFetchingMembers(true);
+    try {
+      const data = await fetchOrgMembers("1"); // Assuming '1' is the orgId
+      console.log(data);
+      setMembers(data);
+    } catch (error) {
+      console.error("Error fetching members:", error);
+    } finally {
+      setIsFetchingMembers(false);
+    }
   };
 
-  const handleEditRole = (id: string, newRole: "Owner" | "Moderator") => {
-    setMembers(
-      members.map((member) =>
-        member.id === id ? { ...member, role: newRole } : member
-      )
-    );
+  useEffect(() => {
+    handleFetchOrgMembers();
+  }, []);
+
+  const handleAddMember = async (email: string) => {
+    try {
+      const result = await inviteUser("1", { email });
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      toast({
+        title: "Member added",
+        description: "The member has been added successfully.",
+      });
+
+      await handleFetchOrgMembers();
+    } catch (error) {
+      console.error("Error adding member:", error);
+      if (error instanceof Error) {
+        toast({
+          title: "Error adding member",
+          description: error.toString(),
+          variant: "destructive",
+        });
+      }
+    }
   };
 
-  const handleRemoveMember = (id: string) => {
-    setMembers(members.filter((member) => member.id !== id));
+  const handleEditRole = async (
+    userId: string,
+    newRole: "owner" | "moderator"
+  ) => {
+    try {
+      const result = await editUserRole("1", {
+        user_id: userId,
+        role: newRole,
+      });
+
+      if (!result.success) {
+        throw new Error(result.error.message);
+      }
+
+      toast({
+        title: "Role updated",
+        description: "The role has been updated successfully.",
+      });
+
+      await handleFetchOrgMembers();
+    } catch (error) {
+      console.error(error);
+      if (error instanceof Error) {
+        toast({
+          title: "Failed to update role",
+          variant: "destructive",
+          description: error.toString(),
+        });
+      }
+    }
+  };
+
+  const handleRemoveMember = async (userId: string) => {
+    try {
+      const result = await removeMember("1", { user_id: userId });
+
+      if (!result.success) {
+        throw new Error(result.error.message);
+      }
+
+      console.log(result.message);
+      toast({
+        title: "Member removed",
+        description: "The member has been removed successfully.",
+      });
+    } catch (error) {
+      console.error("Error removing member:", error);
+      toast({
+        title: "Error removing member",
+        description: "An error occurred while removing the member.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -70,6 +134,7 @@ export function TeamManagement() {
         members={filteredMembers}
         onEditRole={handleEditRole}
         onRemoveMember={handleRemoveMember}
+        isLoading={isFetchingMembers}
       />
       <AddMemberModal
         isOpen={isAddModalOpen}

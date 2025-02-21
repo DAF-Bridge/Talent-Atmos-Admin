@@ -1,7 +1,11 @@
 export type TeamMember = {
-  id: string;
-  name: string;
-  email: string;
-  role: "Owner" | "Moderator";
-  avatarUrl: string;
+  role: "owner" | "moderator";
+  user: {
+    id: string;
+    name: string;
+    picUrl: string;
+    email: string;
+    role: string;
+    updatedAt: string;
+  };
 };

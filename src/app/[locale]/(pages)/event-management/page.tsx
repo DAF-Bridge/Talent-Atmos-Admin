@@ -12,16 +12,60 @@ import EventDisplay from "@/features/event-manage/components/event-display";
 import EventList from "@/features/event-manage/components/event-list";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Link } from "@/i18n/routing";
+import { Event } from "@/lib/types";
+import { formatExternalUrl } from "@/lib/utils";
 import { Search } from "lucide-react";
-import React from "react";
+import { useSearchParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import { BiEdit } from "react-icons/bi";
 
 export default function EventManagementPage() {
   const defaultLayout = [35, 65];
   const isMobile = useIsMobile();
+  const [events, setEvents] = useState<Event[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const searchParams = useSearchParams();
+  const currentId = searchParams.get("id");
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        setIsLoading(true);
+        const apiUrl = formatExternalUrl("/events");
+        const response = await fetch(apiUrl, {});
+        if (!response.ok) {
+          throw new Error("Failed to fetch events");
+        }
+
+        const job = await response.json();
+        console.log(job);
+        setEvents(job);
+      } catch (error) {
+        console.error("Failed to fetch events");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  // set current id to first items in array
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams);
+    if (events.length > 0 && currentId === null) {
+      params.set("id", events[0].id.toString());
+      window.history.replaceState(null, "", `?${params.toString()}`); //Updates the browser history without reloading
+    }
+  }, [events, searchParams, currentId]);
+
   return (
     <ResizablePanelGroup direction="horizontal" className="h-full">
-      <ResizablePanel className="min-w-[250px]" defaultSize={defaultLayout[0]} minSize={25}>
+      <ResizablePanel
+        className="min-w-[250px]"
+        defaultSize={defaultLayout[0]}
+        minSize={25}
+      >
         <div className="h-full overflow-y-auto px-2">
           <Tabs defaultValue="all">
             <div className="flex flex-col justify-start items-start gap-2 pt-4 mb-2">
@@ -66,10 +110,20 @@ export default function EventManagementPage() {
               </TabsList>
             </div>
             <TabsContent value="all" className="m-0">
-              <EventList />
+              <EventList
+                events={events}
+                isLoading={isLoading}
+                currentId={currentId}
+                isMobile={isMobile}
+              />
             </TabsContent>
             <TabsContent value="unread" className="m-0">
-              <EventList />
+              <EventList
+                events={events}
+                isLoading={isLoading}
+                currentId={currentId}
+                isMobile={isMobile}
+              />
             </TabsContent>
           </Tabs>
         </div>
@@ -81,7 +135,7 @@ export default function EventManagementPage() {
         className={isMobile ? "hidden" : ""}
       >
         <div className="h-full overflow-y-auto p-2">
-          <EventDisplay />
+          <EventDisplay currentId={currentId} />
         </div>
       </ResizablePanel>
     </ResizablePanelGroup>

@@ -1,6 +1,6 @@
 export type LanguageCode = "th" | "en";
 
-export type Event = {
+export interface Event {
   id: number;
   name: string;
   startDate: string;
@@ -8,56 +8,35 @@ export type Event = {
   startTime: string;
   endTime: string;
   picUrl: string;
-  location: string;
+  locationName: string;
   latitude: number;
   longitude: number;
-  price: string;
+  priceType: string;
   category: string;
   organization: {
     id: number;
     name: string;
     picUrl: string;
   };
-};
+}
 
-export type EventDescriptionProps = {
-  event: {
-    id: number;
-    name: string;
-    description: string;
-    startDate: string;
-    endDate?: string;
-    startTime: string;
-    endTime?: string;
-    price: string;
-    picUrl: string;
-    highlight: string;
-    requirements: string;
-    outcomes: Array<string>;
-    timeline: Array<{ date: string; content: string }>;
-    benefits: Array<string>;
-    location: {
-      name: string;
-      map_url: string;
-      image_url: string;
-      lat: number;
-      lng: number;
-    };
-    contact: Array<{ type: string; url: string }>;
-    regLink: string;
+export interface EventDescription extends Event {
+  content: {
+    html: string;
   };
-  organization: {
-    id: number;
-    name: string;
-    picUrl: string;
-  };
-};
+  province: string;
+  locationType: string;
+  audience: string;
+  status: "draft" | "published" | "";
+}
 
 export type EventFormValues = {
   picUrl: string;
   name: string;
-  description: string;
-  location: string;
+  content: string;
+  locationName: string;
+  locationType: string;
+  audience: string;
   province: string;
   country: string;
   startDate: string;
@@ -66,11 +45,11 @@ export type EventFormValues = {
   endTime: string;
   latitude: string;
   longitude: string;
-  price: string;
-  regLink: string;
-  status: "draft" | "published" | "";
-  categories: { value: string; label: string }[];
-  contactChannels: { type: string; url: string }[];
+  priceType: string;
+  registerLink: string;
+  status: string;
+  categories: [{ label: string; value: string }];
+  contactChannels: { media: string; mediaLink: string }[];
 };
 
 export type Organization = {
@@ -83,23 +62,32 @@ export type Organization = {
   industry: string[];
 };
 
-export type Job = {
+export interface JobCardProps {
   id: number;
-  UpdatedAt: string;
   title: string;
-  scope: string;
+  description: string;
   workplace: "remote" | "onsite" | "hybrid";
   work_type: "fulltime" | "parttime" | "volunteer" | "internship";
   career_stage: "entrylevel" | "midlevel" | "senior";
+  hoursPerDay: string;
   period: string;
-  description: string;
-  hours_per_day: string;
+  quantity: number;
+  province: string;
+  country: string;
+  salary: number;
+  imgUrl?: string;
+  UpdatedAt: string;
+  orgName?: string;
+  industry: string[];
+}
+
+export interface JobDescriptionPage extends JobCardProps {
+  scope: string;
+  prerequisite: { name: string; url: string }[];
+  workplaceDesc?: string;
   qualifications: string;
   benefits: string;
-  quantity: number;
-  industry: string[];
-  salary: number;
-};
+}
 
 export type JobFormValues = {
   id: number;
@@ -141,31 +129,3 @@ export type UserProfile = {
   role: string;
   updatedAt: string;
 };
-
-export interface JobCardProps {
-  id: number;
-  title: string;
-  description: string;
-  work_type: string;
-  workplace: string;
-  career_stage: string;
-  province: string;
-  country: string;
-  salary: number;
-  imgUrl?: string;
-  updatedDate: string;
-  orgName?: string;
-  industry: string[];
-  isBooked?: boolean;
-}
-
-export interface JobDescriptionPage extends JobCardProps {
-  scope: string;
-  prerequisite: { name: string; url: string }[];
-  workplaceDesc?: string;
-  hours_per_day: string;
-  qualifications: string;
-  benefits: string;
-  quantity: number;
-  period: string;
-}

@@ -16,13 +16,13 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
 import { TeamMember } from "../lib/types";
+import { Loader2 } from "lucide-react";
 
 type EditRoleModalProps = {
   isOpen: boolean;
   onClose: () => void;
   member: TeamMember;
-  onEditRole: (newRole: "Owner" | "Moderator") => void;
-//   onRemoveMember: (id: string) => void;
+  onEditRole: (id: string, newRole: "owner" | "moderator") => Promise<void>;
 };
 
 export function EditRoleModal({
@@ -30,19 +30,17 @@ export function EditRoleModal({
   onClose,
   member,
   onEditRole,
-//   onRemoveMember,
 }: Readonly<EditRoleModalProps>) {
   const [selectedRole, setSelectedRole] = useState(member.role);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSave = () => {
-    onEditRole(selectedRole);
-    onClose();
+  const { id, name, picUrl, email } = member.user;
+
+  const handleSave = async () => {
+    setIsSubmitting(true);
+    await onEditRole(id, selectedRole);
+    setIsSubmitting(false);
   };
-
-//   const handleRemove = () => {
-//     onRemoveMember(member.id);
-//     onClose();
-//   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -53,12 +51,12 @@ export function EditRoleModal({
         <div className="grid gap-4 py-4">
           <div className="flex items-center space-x-4">
             <Avatar>
-              <AvatarImage src={member.avatarUrl} alt={member.name} />
-              <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
+              <AvatarImage src={picUrl} alt={name} />
+              <AvatarFallback>{name.charAt(0)}</AvatarFallback>
             </Avatar>
             <div>
-              <h3 className="font-medium">{member.name}</h3>
-              <p className="text-sm text-gray-500">{member.email}</p>
+              <h3 className="font-medium">{name}</h3>
+              <p className="text-sm text-gray-500">{email}</p>
             </div>
           </div>
           <div className="space-y-2">
@@ -67,7 +65,7 @@ export function EditRoleModal({
             </label>
             <Select
               value={selectedRole}
-              onValueChange={(value: "Owner" | "Moderator") =>
+              onValueChange={(value: "owner" | "moderator") =>
                 setSelectedRole(value)
               }
             >
@@ -75,25 +73,27 @@ export function EditRoleModal({
                 <SelectValue placeholder="Select a role" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Owner">Owner</SelectItem>
-                <SelectItem value="Moderator">Moderator</SelectItem>
+                <SelectItem value="owner">Owner</SelectItem>
+                <SelectItem value="moderator">Moderator</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </div>
         <DialogFooter>
-          {/* <Button
-            variant="outline"
-            className="border-red-500 text-red-500 hover:bg-red-50"
-            onClick={handleRemove}
-          >
-            Remove
-          </Button> */}
           <div className="flex space-x-2">
             <Button variant="outline" onClick={onClose}>
               Close
             </Button>
-            <Button onClick={handleSave}>Save</Button>
+            <Button onClick={handleSave} disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Loading
+                </>
+              ) : (
+                "Save"
+              )}
+            </Button>
           </div>
         </DialogFooter>
       </DialogContent>

@@ -7,20 +7,17 @@ import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import LangSwitcher from "@/components/common/LangSwitcher";
 import { FieldValues, useForm } from "react-hook-form";
-// import { formatInternalUrl } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
-import { useRouter } from "@/i18n/routing";
 import { useAuth } from "@/context/AuthContext";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-// import { formatExternalUrl } from "@/lib/utils";
 import GoogleLoginBtn from "@/features/auth/GoogleLoginBtn";
+import { signIn } from "@/features/auth/api/action";
 
 export default function SigninPage() {
   const t = useTranslations("HomePage");
   const [showPassword, setShowPassword] = useState(false);
   const { setAuthState } = useAuth();
-  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -42,43 +39,33 @@ export default function SigninPage() {
 
   const OnSubmit = async (data: FieldValues) => {
     try {
-      // const apiUrl = formatInternalUrl("/api/auth/signin");
-
-      const res = await fetch("/api/auth/signin", {
-        cache: "no-store",
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include", // Send and receive cookies
-        body: JSON.stringify(data), // Send validated data
+      const result = await signIn({
+        email: data.email,
+        password: data.password,
       });
 
-      if (res.ok) {
+      if (result.success) {
         // Await the full auth state setup
         setAuthState();
-
-        const result = await res.json();
         toast({
           title: "Success",
-          description: result,
+          description: "Signin using email successful",
         });
 
-        router.push("/dashboard");
+        window.location.href = "/dashboard";
       } else {
-        const result = await res.json();
-        toast({
-          title: "Error",
-          variant: "destructive",
-          description: result,
-        });
-        console.error(result);
+        throw new Error(result.error);
       }
     } catch (error) {
+      console.error("Login error:", error);
       toast({
-        title: "Error",
+        title: "Login failed",
+        description:
+          error instanceof Error
+            ? error.message
+            : "An error occurred during login.",
         variant: "destructive",
-        description: "Something went wrong",
       });
-      console.error(error);
     }
   };
 

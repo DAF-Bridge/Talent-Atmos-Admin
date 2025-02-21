@@ -2,21 +2,20 @@
 
 import EventFormPage from "@/features/event-manage/components/EventFormPage";
 import { toast } from "@/hooks/use-toast";
-// import { useRouter } from "@/i18n/routing";
 import { EventFormValues } from "@/lib/types";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 
-export default function EditEventPage({
-  // params,
-}: Readonly<{ params: { id: string } }>) {
-  // const router = useRouter();
+export default function EditEventPage() {
+
   const form = useForm<EventFormValues>({
     defaultValues: {
       picUrl: "",
       name: "",
-      description: "",
-      location: "",
+      content: "",
+      locationName: "",
+      locationType: "",
+      audience: "",
       province: "",
       country: "TH",
       startDate: "",
@@ -25,11 +24,11 @@ export default function EditEventPage({
       endTime: "",
       latitude: "",
       longitude: "",
-      price: "free",
-      regLink: "",
+      priceType: "free",
+      registerLink: "",
       status: "",
       categories: [],
-      contactChannels: [{ type: "", url: "" }],
+      contactChannels: [{ media: "", mediaLink: "" }],
     },
   });
   const [isDialogOpen, setIsDialogOpen] = useState(false);

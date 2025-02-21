@@ -6,7 +6,7 @@ import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import type { DateRange } from "react-day-picker";
 
-import { cn, convertDateToISOString } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -55,14 +55,18 @@ export function DatePickerWithRange({
   useEffect(() => {
     if (date?.from) {
       // Set the start date as ISO / UTC
-      form.setValue("startDate", convertDateToISOString(date.from.toString()), {
+      const formattedDate = format(date?.from, "dd-MM-yyyy");
+      console.log(formattedDate);
+      form.setValue("startDate", formattedDate, {
         shouldValidate: true,
       });
     }
 
     if (date?.to) {
       // Set the end date as ISO / UTC
-      form.setValue("endDate", convertDateToISOString(date.to.toString()), {
+      const formattedDate = format(date?.to, "dd-MM-yyyy");
+      console.log(formattedDate);
+      form.setValue("endDate", formattedDate, {
         shouldValidate: true,
       });
     }

@@ -10,9 +10,8 @@ import {
   useCallback,
 } from "react";
 import type { AuthContextType, UserProfile } from "@/lib/types";
-import { formatInternalUrl } from "@/lib/utils";
-import Cookie from "js-cookie";
 import { toast } from "@/hooks/use-toast";
+import { getCurrentUser, signOut } from "@/features/auth/api/action";
 
 const AuthContext = createContext<AuthContextType>({
   isAuth: null,
@@ -28,39 +27,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
 
-  const checkAuthFlag = useCallback(() => {
-    return Cookie.get("hasAuth") === "true";
-  }, []);
-
   const fetchUserProfile = useCallback(async () => {
     setLoading(true);
     try {
-      const apiUrl = formatInternalUrl("/api/auth/current-user");
-
-      const response = await fetch(apiUrl, {
-        cache: "no-store",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUserProfile(data);
-        setIsAuth(true);
-        console.log("You are authenticated");
-        // Set a flag cookie when authentication is successful
-        Cookie.set("hasAuth", "true", { path: "/", sameSite: "strict" });
-      } else {
-        throw new Error("Authentication failed");
+      const result = await getCurrentUser();
+      if (!result.success) {
+        throw new Error(result.error);
       }
+      setUserProfile(result.data);
+      setIsAuth(true);
     } catch (err) {
       console.error(err);
       setUserProfile(null);
       setIsAuth(false);
-      // Remove the flag cookie and authToken on authentication failure
-      Cookie.remove("hasAuth", { path: "/" });
     } finally {
       setLoading(false);
     }
@@ -69,24 +48,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const initializeAuth = async () => {
       setIsHydrated(true);
-      // Only fetch if there's an indication of authentication
-      if (checkAuthFlag()) {
-        try {
-          await fetchUserProfile();
-        } catch (error) {
-          // If fetchUserProfile fails, remove both hasAuth and authToken
-          Cookie.remove("hasAuth", { path: "/" });
-          setIsAuth(false);
-          setUserProfile(null);
-        }
-      } else {
+
+      try {
+        await fetchUserProfile();
+      } catch (error) {
         setIsAuth(false);
-        setLoading(false);
+        setUserProfile(null);
       }
     };
 
     initializeAuth();
-  }, [fetchUserProfile, checkAuthFlag]);
+  }, [fetchUserProfile]);
 
   // will set auth state if fetchUserProfile is complete
   const setAuthState = useCallback(async () => {
@@ -94,16 +66,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [fetchUserProfile]);
 
   const removeAuthState = useCallback(async () => {
-    const apiUrl = formatInternalUrl("/api/auth/logout");
-    const res = await fetch(apiUrl, {
-      method: "POST",
-      credentials: "include",
-    });
-    if (res.ok) {
+    const result = await signOut();
+    if (result.success) {
       setIsAuth(false);
       setUserProfile(null);
-      // Remove both hasAuth and authToken cookies
-      Cookie.remove("hasAuth", { path: "/" });
       window.location.href = "/";
     } else {
       console.log("Logout Failed");

@@ -18,10 +18,15 @@ const generateTimeOptions = () => {
     for (let minute = 0; minute < 60; minute += 30) {
       const formattedHour = hour.toString().padStart(2, "0");
       const formattedMinute = minute.toString().padStart(2, "0");
-      options.push(`${formattedHour}:${formattedMinute}`);
+      options.push(`${formattedHour}:${formattedMinute}:00`);
     }
   }
   return options;
+};
+
+const removeSeconds = (time: string) => {
+  const [hours, minutes] = time.split(":");
+  return `${hours}:${minutes}`;
 };
 
 const timeOptions = generateTimeOptions();
@@ -45,36 +50,36 @@ export default function TimeRangePicker({
   const endTime = watch("endTime");
 
   // Convert UTC time to local time format
-  const convertToSimpleFormat = (utcTime: string) => {
-    const date = new Date(utcTime);
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    return `${hours}:${minutes}`;
-  };
+  // const convertToSimpleFormat = (utcTime: string) => {
+  //   const date = new Date(utcTime);
+  //   const hours = date.getHours().toString().padStart(2, "0");
+  //   const minutes = date.getMinutes().toString().padStart(2, "0");
+  //   return `${hours}:${minutes}`;
+  // };
 
   const validEndTimes = useMemo(() => {
     if (!startTime) return timeOptions;
-    const startIndex = timeOptions.indexOf(convertToSimpleFormat(startTime));
+    const startIndex = timeOptions.indexOf(startTime);
     return timeOptions.slice(startIndex + 1);
   }, [startTime]);
 
-  // Convert local time to UTC
-  const convertToUTCTime = (localTime: string) => {
-    const [hours, minutes] = localTime.split(":");
-    const date = new Date();
-    date.setHours(
-      Number.parseInt(hours, 10),
-      Number.parseInt(minutes, 10),
-      0,
-      0
-    );
-    return date.toISOString();
-  };
+  // // Convert local time to UTC
+  // const convertToUTCTime = (localTime: string) => {
+  //   const [hours, minutes] = localTime.split(":");
+  //   const date = new Date();
+  //   date.setHours(
+  //     Number.parseInt(hours, 10),
+  //     Number.parseInt(minutes, 10),
+  //     0,
+  //     0
+  //   );
+  //   return date.toISOString();
+  // };
 
   useEffect(() => {
     if (startTime && endTime) {
-      const startIndex = timeOptions.indexOf(convertToSimpleFormat(startTime));
-      const endIndex = timeOptions.indexOf(convertToSimpleFormat(endTime));
+      const startIndex = timeOptions.indexOf(startTime);
+      const endIndex = timeOptions.indexOf(endTime);
       if (endIndex <= startIndex) {
         form.setValue("endTime", "");
       }
@@ -97,12 +102,11 @@ export default function TimeRangePicker({
             rules={{ required: errMsgStartTime }}
             render={({ field }) => (
               <Select
-                onValueChange={(value) =>
-                  field.onChange(convertToUTCTime(value))
-                }
-                value={
-                  startTime ? convertToSimpleFormat(field.value) : undefined
-                }
+                onValueChange={(value) => {
+                  console.log(value);
+                  field.onChange(value);
+                }}
+                value={startTime ? field.value : undefined}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select start time" />
@@ -115,7 +119,7 @@ export default function TimeRangePicker({
                 <SelectContent className="h-[200px]">
                   {timeOptions.map((time) => (
                     <SelectItem key={`start-${time}`} value={time}>
-                      {time}
+                      {removeSeconds(time)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -134,11 +138,10 @@ export default function TimeRangePicker({
             render={({ field }) => (
               <Select
                 onValueChange={(value) => {
-                  console.log("Before: ", value);
-                  console.log("After: ", convertToUTCTime(value));
-                  field.onChange(convertToUTCTime(value));
+                  console.log(value);
+                  field.onChange(value);
                 }}
-                value={endTime ? convertToSimpleFormat(field.value) : undefined}
+                value={endTime ? field.value : undefined}
                 disabled={!startTime}
               >
                 <SelectTrigger className="w-full">
@@ -152,7 +155,7 @@ export default function TimeRangePicker({
                 <SelectContent className="h-[200px]">
                   {validEndTimes.map((time) => (
                     <SelectItem key={`end-${time}`} value={time}>
-                      {time}
+                      {removeSeconds(time)}
                     </SelectItem>
                   ))}
                 </SelectContent>

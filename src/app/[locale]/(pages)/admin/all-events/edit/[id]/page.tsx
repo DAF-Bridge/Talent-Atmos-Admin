@@ -7,16 +7,17 @@ import { EventFormValues } from "@/lib/types";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 
-export default function FullEditEventPage({
-  // params,
-}: Readonly<{ params: { id: string } }>) {
+export default function FullEditEventPage({}: // params,
+Readonly<{ params: { id: string } }>) {
   // const router = useRouter();
   const form = useForm<EventFormValues>({
     defaultValues: {
       picUrl: "",
       name: "",
-      description: "",
-      location: "",
+      content: "",
+      locationName: "",
+      locationType: "", //
+      audience: "", //
       province: "",
       country: "TH",
       startDate: "",
@@ -25,11 +26,11 @@ export default function FullEditEventPage({
       endTime: "",
       latitude: "",
       longitude: "",
-      price: "free",
-      regLink: "",
+      priceType: "",
+      registerLink: "",
       status: "",
       categories: [],
-      contactChannels: [{ type: "", url: "" }],
+      contactChannels: [{ media: "", mediaLink: "" }],
     },
   });
   const [isDialogOpen, setIsDialogOpen] = useState(false);

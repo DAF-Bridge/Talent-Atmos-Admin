@@ -12,30 +12,35 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import {  Plus, Trash2 } from "lucide-react";
+import { Loader2, Plus, Trash2 } from "lucide-react";
 import React, { useState } from "react";
 import {
   useForm,
   Controller,
   useFieldArray,
   FieldValues,
-  FieldError,
 } from "react-hook-form";
 import Image from "next/image";
-// import { Link } from "@/i18n/routing";
+import { toast } from "@/hooks/use-toast";
+import GenericMultipleSelector from "@/components/common/MultiSelectWithSearch";
+import { Option } from "@/components/ui/MultiSelect";
+import { base64ToFile, formatExternalUrl } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { provinces } from "@/components/config/Provinces";
+import { useLocale } from "next-intl";
+import { createOrg } from "@/features/organization/api/action";
 
 export default function OrgRegisterPage() {
-  const {
-    register,
-    handleSubmit,
-    control,
-    formState: { errors },
-    setValue,
-    setError,
-    clearErrors,
-  } = useForm({
+  const locale = useLocale();
+  const form = useForm({
     defaultValues: {
-      userEmail: "",
       logo: "",
       email: "",
       name: "",
@@ -47,21 +52,136 @@ export default function OrgRegisterPage() {
       country: "TH",
       latitude: "",
       longitude: "",
-      telephone: "",
-      contactChannels: [{ type: "", url: "" }],
+      phone: "",
+      organizationContacts: [{ media: "", mediaLink: "" }],
+      industries: [],
     },
   });
 
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors, isSubmitting },
+    setValue,
+    setError,
+    clearErrors,
+  } = form;
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   const { fields, append, remove } = useFieldArray({
     control,
-    name: "contactChannels",
+    name: "organizationContacts",
   });
 
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
-  const onSubmit = (data: FieldValues) => {
-    console.log(data);
-    // Here you would typically send the data to your API
+  const fetchIndustries = async (value: string): Promise<Option[]> => {
+    try {
+      const apiUrl = formatExternalUrl("/orgs/industries/list");
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+      const industries = data.industries;
+      console.log(industries);
+      if (value) {
+        return industries
+          .filter((industry: { name: string; id: number }) =>
+            industry.name.toLowerCase().includes(value.toLowerCase())
+          )
+          .map((industry: { name: string; id: number }) => ({
+            label: industry.name,
+            value: industry.id,
+          }));
+      } else {
+        return industries.map((industry: { name: string; id: number }) => ({
+          label: industry.name,
+          value: industry.id,
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching industries:", error);
+      return [];
+    }
+  };
+
+  const validateAndOpenDialog = async () => {
+    // Trigger all field validations
+    const isFormValid = await form.trigger();
+
+    // Check if the form is valid and there are no custom errors
+    if (isFormValid) {
+      setIsDialogOpen(true);
+    } else {
+      // Show error toast and scroll to the first error
+      toast({
+        variant: "destructive",
+        title: "Validation Error",
+        description: "Please fill in all required fields correctly",
+      });
+
+      // Find and scroll to the first error
+      const firstError = document.querySelector(".error-msg");
+      if (firstError) {
+        firstError.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
+  };
+
+  const onSubmit = async (data: FieldValues) => {
+    // Create FormData object
+    const formData = new FormData();
+
+    // Exclude `logo` from `data`
+    const { logo, ...otherData } = data;
+
+    // create image file from base64 string
+    const uniqueFilename = `org_${Date.now()}.png`;
+    const imgFile = base64ToFile(logo, uniqueFilename);
+
+    // Append image to FormData
+    if (imgFile instanceof File) {
+      formData.append("image", imgFile);
+    }
+
+    // construct json from other data fields exclude image
+    const jsonData = JSON.stringify({
+      ...otherData,
+      latitude: data.latitude ? Number(data.latitude) : null,
+      longitude: data.longitude ? Number(data.longitude) : null,
+      industries: Array.isArray(data.industries)
+        ? data.industries.map((industry) => industry.value)
+        : [],
+    });
+    formData.append("org", jsonData);
+
+    // display all form value
+    formData.forEach((value, key) => {
+      console.log(key, value);
+    });
+
+    try {
+      const result = await createOrg(formData);
+
+      if (!result.success) {
+        throw new Error(result.error.message);
+      }
+
+      toast({
+        title: "Success",
+        description: result.message,
+      });
+      setIsDialogOpen(false);
+    } catch (error: unknown) {
+      console.error(error);
+      if (error instanceof Error) {
+        toast({
+          title: "Failed to register organization",
+          variant: "destructive",
+          description: error.toString(),
+        });
+      }
+    }
   };
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -106,13 +226,6 @@ export default function OrgRegisterPage() {
   return (
     <div className="flex min-h-screen items-center justify-center px-6 pt-4 mb-16 max-w-[800px] mx-auto">
       <Card className="relative w-full">
-        {/* <Link
-          href="/"
-          className="absolute flex items-center gap-2 top-2 left-2 hover:bg-slate-100 pr-2 py-1 rounded-md"
-        >
-          <ChevronLeft />
-          <span>Home</span>
-        </Link> */}
         <CardHeader className="">
           <CardTitle className="text-2xl font-medium">
             Register Organization{" "}
@@ -153,19 +266,21 @@ export default function OrgRegisterPage() {
                   {...register("logo", { required: "Logo is required" })}
                 />
                 {errors.logo && (
-                  <p className="text-sm text-red-500 mt-1">
-                    {errors.logo.message}
-                  </p>
+                  <p className="error-msg mt-1">{errors.logo.message}</p>
                 )}
               </div>
             </div>
 
             <div>
               <Label htmlFor="email">
-                Organization Email (Use dedicated email)
+                <span>Organization Email</span>
+                <span className="text-xs text-muted-foreground font-light">
+                  {" (Use dedicated email)"}
+                </span>
               </Label>
               <Input
                 id="email"
+                placeholder="Enter your organization email"
                 {...register("email", {
                   required: "Email is required",
                   pattern: {
@@ -175,9 +290,7 @@ export default function OrgRegisterPage() {
                 })}
               />
               {errors.email && (
-                <p className="text-sm text-red-500 mt-1">
-                  {errors.email.message}
-                </p>
+                <p className="error-msg mt-1">{errors.email.message}</p>
               )}
             </div>
 
@@ -185,44 +298,64 @@ export default function OrgRegisterPage() {
               <Label htmlFor="name">Organization Name</Label>
               <Input
                 id="name"
+                placeholder="Enter your organization name"
                 {...register("name", {
                   required: "Organization name is required",
                 })}
               />
               {errors.name && (
-                <p className="text-sm text-red-500 mt-1">
-                  {errors.name.message}
-                </p>
+                <p className="error-msg mt-1">{errors.name.message}</p>
               )}
             </div>
 
             <div>
-              <Label htmlFor="headline">Headline</Label>
+              <Label htmlFor="headline">
+                <span>Headline</span>
+                <span className="text-xs text-muted-foreground font-light">
+                  {" (short description about your organization)"}
+                </span>
+              </Label>
               <Input
                 id="headline"
+                placeholder="eg. Startup Incubation Platform, etc."
                 {...register("headline", {
                   required: "Headline is required",
                 })}
               />
               {errors.headline && (
-                <p className="text-sm text-red-500 mt-1">
-                  {errors.headline.message}
-                </p>
+                <p className="error-msg mt-1">{errors.headline.message}</p>
               )}
             </div>
 
             <div>
-              <Label htmlFor="specialty">Specialty</Label>
+              <Label htmlFor="specialty">
+                <span>Specialty</span>
+                <span className="text-xs text-muted-foreground font-light">
+                  {" (what do your organization specialize in?)"}
+                </span>
+              </Label>
               <Input
                 id="specialty"
+                placeholder="eg. Elderly Care, Social Work, etc."
                 {...register("specialty", {
                   required: "Specialty is required",
                 })}
               />
               {errors.specialty && (
-                <p className="text-sm text-red-500 mt-1">
-                  {errors.specialty.message}
-                </p>
+                <p className="error-msg mt-1">{errors.specialty.message}</p>
+              )}
+            </div>
+
+            <div>
+              <Label>Industries</Label>
+              <GenericMultipleSelector
+                form={form}
+                errMessage={"Industries is required"}
+                name="industries"
+                onSearch={fetchIndustries}
+              />
+              {errors.industries && (
+                <p className="error-msg">{errors.industries.message}</p>
               )}
             </div>
 
@@ -230,14 +363,13 @@ export default function OrgRegisterPage() {
               <Label htmlFor="description">Description</Label>
               <Textarea
                 id="description"
+                placeholder="Enter your organization description"
                 {...register("description", {
                   required: "Description is required",
                 })}
               />
               {errors.description && (
-                <p className="text-sm text-red-500 mt-1">
-                  {errors.description.message}
-                </p>
+                <p className="error-msg mt-1">{errors.description.message}</p>
               )}
             </div>
 
@@ -245,12 +377,11 @@ export default function OrgRegisterPage() {
               <Label htmlFor="address">Address</Label>
               <Textarea
                 id="address"
+                placeholder="Enter your organization address"
                 {...register("address", { required: "Address is required" })}
               />
               {errors.address && (
-                <p className="text-sm text-red-500 mt-1">
-                  {errors.address.message}
-                </p>
+                <p className="error-msg mt-1">{errors.address.message}</p>
               )}
             </div>
 
@@ -266,16 +397,22 @@ export default function OrgRegisterPage() {
                       <SelectTrigger id="province">
                         <SelectValue placeholder="Select a province" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="TH">Thai</SelectItem>
+                      <SelectContent className="h-[300px]">
+                        {provinces.map((province) => (
+                          <SelectItem
+                            className="text-sm"
+                            key={province.code}
+                            value={province.code}
+                          >
+                            {locale === "th" ? province.th : province.en}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   )}
                 />
                 {errors.province && (
-                  <p className="text-sm text-red-500 mt-1">
-                    {errors.province.message}
-                  </p>
+                  <p className="error-msg mt-1">{errors.province.message}</p>
                 )}
               </div>
 
@@ -297,15 +434,18 @@ export default function OrgRegisterPage() {
                   )}
                 />
                 {errors.country && (
-                  <p className="text-sm text-red-500 mt-1">
-                    {errors.country.message}
-                  </p>
+                  <p className="error-msg mt-1">{errors.country.message}</p>
                 )}
               </div>
             </div>
 
             <div className="mt-2">
-              <p className="text-base font-medium">Map Coordinate</p>
+              <p className="text-base font-medium">
+                <span>Map Coordinate</span>
+                <span className="text-xs text-muted-foreground font-light">
+                  {" (Required for map marker)"}
+                </span>
+              </p>
               <div className="grid grid-cols-2 gap-5">
                 <div>
                   <Label
@@ -316,6 +456,7 @@ export default function OrgRegisterPage() {
                   </Label>
                   <Input
                     id="latitude"
+                    placeholder="eg. 13.7563..."
                     {...register("latitude", {
                       required: "Latitude is required",
                       pattern: {
@@ -325,9 +466,7 @@ export default function OrgRegisterPage() {
                     })}
                   />
                   {errors.latitude && (
-                    <p className="text-sm text-red-500 mt-1">
-                      {errors.latitude.message}
-                    </p>
+                    <p className="error-msg mt-1">{errors.latitude.message}</p>
                   )}
                 </div>
                 <div>
@@ -339,6 +478,7 @@ export default function OrgRegisterPage() {
                   </Label>
                   <Input
                     id="longitude"
+                    placeholder="eg. 100.565..."
                     {...register("longitude", {
                       required: "Longitude is required",
                       pattern: {
@@ -348,9 +488,7 @@ export default function OrgRegisterPage() {
                     })}
                   />
                   {errors.longitude && (
-                    <p className="text-sm text-red-500 mt-1">
-                      {errors.longitude.message}
-                    </p>
+                    <p className="error-msg mt-1">{errors.longitude.message}</p>
                   )}
                 </div>
               </div>
@@ -360,7 +498,8 @@ export default function OrgRegisterPage() {
               <Label htmlFor="telephone">Telephone</Label>
               <Input
                 id="telephone"
-                {...register("telephone", {
+                placeholder="0811234567"
+                {...register("phone", {
                   required: "Telephone is required",
                   pattern: {
                     value: /^[0-9+\-\s()]*$/,
@@ -368,10 +507,8 @@ export default function OrgRegisterPage() {
                   },
                 })}
               />
-              {errors.telephone && (
-                <p className="text-sm text-red-500 mt-1">
-                  {errors.telephone.message}
-                </p>
+              {errors.phone && (
+                <p className="error-msg mt-1">{errors.phone.message}</p>
               )}
             </div>
 
@@ -383,7 +520,7 @@ export default function OrgRegisterPage() {
                   variant="outline"
                   size="sm"
                   disabled={fields.length >= 4}
-                  onClick={() => append({ type: "", url: "" })}
+                  onClick={() => append({ media: "", mediaLink: "" })}
                   className="flex items-center gap-2"
                 >
                   <Plus className="w-4 h-4" />
@@ -394,16 +531,20 @@ export default function OrgRegisterPage() {
                 {fields.map((field, index) => (
                   <div key={field.id} className="flex gap-4 items-start">
                     <div className="flex-1">
-                      <Label htmlFor={`contactChannels.${index}.type`}>
+                      <Label htmlFor={`organizationContacts.${index}.type`}>
                         Channel Name
                       </Label>
                       <Controller
-                        name={`contactChannels.${index}.type`}
+                        name={`organizationContacts.${index}.media`}
                         control={control}
-                        rules={{ required: "Channel type is required" }}
+                        rules={{
+                          required: "Channel type is required",
+                        }}
                         render={({ field: { onChange, value } }) => (
                           <Select onValueChange={onChange} value={value}>
-                            <SelectTrigger id={`contactChannels.${index}.type`}>
+                            <SelectTrigger
+                              id={`organizationContacts.${index}.type`}
+                            >
                               <SelectValue placeholder="e.g. Facebook, Twitter, LinkedIn" />
                             </SelectTrigger>
                             <SelectContent>
@@ -418,34 +559,34 @@ export default function OrgRegisterPage() {
                           </Select>
                         )}
                       />
-                      {errors.contactChannels?.[index]?.type && (
-                        <p className="text-sm text-red-500 mt-1">
-                          {
-                            (errors.contactChannels[index].type as FieldError)
-                              ?.message
-                          }
+                      {errors.organizationContacts?.[index]?.media && (
+                        <p className="error-msg mt-1">
+                          {errors.organizationContacts[index].media?.message}
                         </p>
                       )}
                     </div>
                     <div className="flex-1">
-                      <Label htmlFor={`contactChannels.${index}.url`}>
+                      <Label htmlFor={`organizationContacts.${index}.url`}>
                         URL
                       </Label>
                       <Input
-                        id={`contactChannels.${index}.url`}
+                        id={`organizationContacts.${index}.url`}
                         placeholder="https://"
-                        {...register(`contactChannels.${index}.url`, {
-                          required: "URL is required",
-                          pattern: {
-                            value:
-                              /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]+)*\/?$/,
-                            message: "Invalid URL format",
-                          },
-                        })}
+                        {...register(
+                          `organizationContacts.${index}.mediaLink`,
+                          {
+                            required: "Channel URL is required",
+                            pattern: {
+                              value:
+                                /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]+)*\/?$/,
+                              message: "Invalid URL format",
+                            },
+                          }
+                        )}
                       />
-                      {errors.contactChannels?.[index]?.url && (
-                        <p className="text-sm text-red-500 mt-1">
-                          {errors.contactChannels[index].url.message}
+                      {errors.organizationContacts?.[index]?.mediaLink && (
+                        <p className="error-msg mt-1">
+                          {errors.organizationContacts[index].mediaLink.message}
                         </p>
                       )}
                     </div>
@@ -465,9 +606,49 @@ export default function OrgRegisterPage() {
             </div>
 
             <div className="mt-4">
-              <Button type="submit" className="w-full">
-                Submit
-              </Button>
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <Button
+                  type="button"
+                  onClick={validateAndOpenDialog}
+                  disabled={isSubmitting}
+                  className="w-full"
+                >
+                  Submit
+                </Button>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Confirm Action</DialogTitle>
+                    <DialogDescription>
+                      <span className="text-sm text-gray-700">
+                        Are you ready to create this organization? Please make
+                        sure all the information is correct before creating.
+                      </span>
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter className="flex gap-y-1">
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsDialogOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="submit"
+                      disabled={isSubmitting}
+                      onClick={handleSubmit(onSubmit)}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Loading
+                        </>
+                      ) : (
+                        "Confirm"
+                      )}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
           </form>
         </CardContent>

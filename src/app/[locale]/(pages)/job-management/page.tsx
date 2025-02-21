@@ -12,13 +12,53 @@ import JobDisplay from "@/features/job-manage/components/job-display";
 import JobList from "@/features/job-manage/components/job-list";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Link } from "@/i18n/routing";
+import { JobCardProps } from "@/lib/types";
+import { formatExternalUrl } from "@/lib/utils";
 import { Search } from "lucide-react";
-import React from "react";
+import { useSearchParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import { BiEdit } from "react-icons/bi";
 
 export default function JobManagementPage() {
   const defaultLayout = [35, 65];
   const isMobile = useIsMobile();
+  const [jobs, setJobs] = useState<JobCardProps[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const searchParams = useSearchParams();
+  const currentId = searchParams.get("id");
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        setIsLoading(true);
+        const apiUrl = formatExternalUrl("/orgs/1/jobs/list");
+        const response = await fetch(apiUrl, {});
+        if (!response.ok) {
+          throw new Error("Failed to fetch job");
+        }
+
+        const job = await response.json();
+        console.log(job);
+        setJobs(job);
+      } catch (error) {
+        console.error("Failed to fetch job");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchJobs();
+  }, []);
+
+  // set current id to first items in array
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams);
+    if (jobs.length > 0 && currentId === null) {
+      params.set("id", jobs[0].id.toString());
+      window.history.replaceState(null, "", `?${params.toString()}`); //Updates the browser history without reloading
+    }
+  }, [jobs, searchParams, currentId]);
+
   return (
     <ResizablePanelGroup direction="horizontal" className="h-full">
       <ResizablePanel
@@ -70,10 +110,20 @@ export default function JobManagementPage() {
               </TabsList>
             </div>
             <TabsContent value="all" className="m-0">
-              <JobList />
+              <JobList
+                isLoading={isLoading}
+                jobs={jobs}
+                isMobile={isMobile}
+                currentId={currentId}
+              />
             </TabsContent>
             <TabsContent value="unread" className="m-0">
-              <JobList />
+              <JobList
+                isLoading={isLoading}
+                jobs={jobs}
+                isMobile={isMobile}
+                currentId={currentId}
+              />
             </TabsContent>
           </Tabs>
         </div>
@@ -85,7 +135,7 @@ export default function JobManagementPage() {
         className={isMobile ? "hidden" : ""}
       >
         <div className="h-full overflow-y-auto p-2">
-          <JobDisplay />
+          <JobDisplay currentId={currentId} />
         </div>
       </ResizablePanel>
     </ResizablePanelGroup>

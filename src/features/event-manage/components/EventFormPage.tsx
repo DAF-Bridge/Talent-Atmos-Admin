@@ -2,7 +2,6 @@
 
 import { DatePickerWithRange } from "@/components/common/DateRangePicker";
 import ImageDialog from "@/components/common/ImageDialog";
-import MultipleSelectorWithAsyncSearchAndOnFocus from "@/components/common/MultiSelectWithSearch";
 import RichTextEditor from "@/components/common/RichTextEditor";
 import TimeRangePicker from "@/components/common/TimeRangePicker";
 import { provinces } from "@/components/config/Provinces";
@@ -20,27 +19,23 @@ import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { CloudUpload, Plus, Trash2 } from "lucide-react";
+import { CloudUpload, Loader2, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
-import {
-  Controller,
-  FieldError,
-  useFieldArray,
-  UseFormReturn,
-} from "react-hook-form";
+import { Controller, useFieldArray, UseFormReturn } from "react-hook-form";
 
 import { EventFormValues } from "@/lib/types";
 import { eventErrMsg } from "@/features/event-manage/config/constants";
-import { alphabeticLength } from "@/lib/utils";
+import { alphabeticLength, formatExternalUrl } from "@/lib/utils";
 import { EventPublishToggle } from "./publish-toggle";
+import GenericMultipleSelector from "@/components/common/MultiSelectWithSearch";
+import { Option } from "@/components/ui/MultiSelect";
+import { useLocale } from "next-intl";
 
 interface EventFormPageProps {
   form: UseFormReturn<EventFormValues>;
@@ -62,6 +57,7 @@ export default function EventFormPage({
 }: Readonly<EventFormPageProps>) {
   const { toast } = useToast();
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const locale = useLocale();
 
   const {
     register,
@@ -78,6 +74,33 @@ export default function EventFormPage({
     control,
     name: "contactChannels",
   });
+
+  const fetchCategories = async (value: string): Promise<Option[]> => {
+    try {
+      const apiUrl = formatExternalUrl("/events/categories/list");
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+      const categories = data.categories;
+      if (value) {
+        return categories
+          .filter((industry: { name: string; id: number }) =>
+            industry.name.toLowerCase().includes(value.toLowerCase())
+          )
+          .map((industry: { name: string; id: number }) => ({
+            label: industry.name,
+            value: industry.id,
+          }));
+      } else {
+        return categories.map((industry: { name: string; id: number }) => ({
+          label: industry.name,
+          value: industry.id,
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching industries:", error);
+      return [];
+    }
+  };
 
   const validateAndOpenDialog = async () => {
     // Trigger all field validations
@@ -186,9 +209,9 @@ export default function EventFormPage({
               {logoPreview ? (
                 <div
                   style={{ aspectRatio: "3/4" }}
-                  className="rounded-sm overflow-hidden h-[400px] w-auto drop-shadow-md border"
+                  className="rounded-sm overflow-hidden h-[400px] w-auto drop-shadow-md border group"
                 >
-                  <div className="absolute top-1 right-1 transform z-50">
+                  <div className="absolute top-1 right-1 transform z-50 invisible group-hover:visible">
                     <button
                       onClick={handleUploadImage}
                       type="button"
@@ -198,7 +221,7 @@ export default function EventFormPage({
                     </button>
                   </div>
 
-                  <div className="absolute top-1 left-1 transform z-50">
+                  <div className="invisible group-hover:visible absolute top-1 left-1 transform z-50">
                     <ImageDialog imgUrl={logoPreview} />
                   </div>
 
@@ -294,7 +317,7 @@ export default function EventFormPage({
               <div className="mt-4">
                 <Label htmlFor="priceType">Price Type</Label>
                 <Controller
-                  name="price"
+                  name="priceType"
                   control={control}
                   rules={{ required: eventErrMsg.price.required }}
                   render={({ field }) => (
@@ -312,27 +335,56 @@ export default function EventFormPage({
                     </Select>
                   )}
                 />
-                {errors.price && (
-                  <p className="error-msg">{errors.price.message}</p>
+                {errors.priceType && (
+                  <p className="error-msg">{errors.priceType.message}</p>
                 )}
               </div>
               <div className="mt-4">
                 <Label>Categories</Label>
-                <MultipleSelectorWithAsyncSearchAndOnFocus
+                <GenericMultipleSelector
                   form={form}
                   errMessage={eventErrMsg.categories.required}
+                  name="categories"
+                  onSearch={fetchCategories}
                 />
                 {errors.categories && (
                   <p className="error-msg">{errors.categories.message}</p>
+                )}
+              </div>
+              <div className="mt-4">
+                <Label htmlFor="audience">Audience Level</Label>
+                <Controller
+                  name="audience"
+                  control={control}
+                  rules={{ required: eventErrMsg.price.required }}
+                  render={({ field }) => (
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="general">General</SelectItem>
+                        <SelectItem value="professionals">
+                          Professional
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.priceType && (
+                  <p className="error-msg">{errors.priceType.message}</p>
                 )}
               </div>
             </div>
           </div>
 
           <div>
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="content">Description</Label>
             <Controller
-              name="description"
+              name="content"
               control={control}
               rules={{
                 required: eventErrMsg.description.required,
@@ -361,8 +413,8 @@ export default function EventFormPage({
               )}
             />
 
-            {errors.description && (
-              <p className="error-msg">{errors.description.message}</p>
+            {errors.content && (
+              <p className="error-msg">{errors.content.message}</p>
             )}
           </div>
 
@@ -371,13 +423,38 @@ export default function EventFormPage({
             <h1 className="text-base font-medium border-l-4 pl-2 border-orange-500">
               Map & Location
             </h1>
+            <div className="mt-1">
+              <Label htmlFor="locationType">Event Type</Label>
+              <Controller
+                name="locationType"
+                control={control}
+                rules={{ required: eventErrMsg.price.required }}
+                render={({ field }) => (
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="online">Online</SelectItem>
+                      <SelectItem value="onsite">Onsite</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.priceType && (
+                <p className="error-msg">{errors.priceType.message}</p>
+              )}
+            </div>
             <div className="mb-2">
-              <Label htmlFor="location">Location Name</Label>
+              <Label htmlFor="locationName">Location Name</Label>
               <Input
                 type="text"
-                id="location"
+                id="locationName"
                 className="block w-full rounded-md border border-gray-300 shadow-sm sm:text-sm"
-                {...register("location", {
+                {...register("locationName", {
                   required: eventErrMsg.location.required,
                   minLength: {
                     value: eventErrMsg.location.minVal,
@@ -385,8 +462,8 @@ export default function EventFormPage({
                   },
                 })}
               />
-              {errors.location && (
-                <p className="error-msg">{errors.location.message}</p>
+              {errors.locationName && (
+                <p className="error-msg">{errors.locationName.message}</p>
               )}
             </div>
             <div className="flex gap-4">
@@ -409,25 +486,15 @@ export default function EventFormPage({
                         />
                       </SelectTrigger>
                       <SelectContent className="h-[300px]">
-                        {Object.entries(provinces).map(
-                          ([region, provinceList]) => (
-                            <SelectGroup key={region}>
-                              <SelectLabel className="bg-gray-50 text-center text-sm">
-                                {region}
-                              </SelectLabel>
-
-                              {provinceList.map((province) => (
-                                <SelectItem
-                                  className="text-sm"
-                                  key={province}
-                                  value={province}
-                                >
-                                  {province}
-                                </SelectItem>
-                              ))}
-                            </SelectGroup>
-                          )
-                        )}
+                        {provinces.map((province) => (
+                          <SelectItem
+                            className="text-sm"
+                            key={province.code}
+                            value={province.code}
+                          >
+                            {locale === "th" ? province.th : province.en}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   )}
@@ -521,10 +588,10 @@ export default function EventFormPage({
             <div className="mt-2">
               <Input
                 type="text"
-                id="regLink"
+                id="registerLink"
                 placeholder="Link to registration form or page"
                 className="block w-full rounded-md border border-gray-300 shadow-sm sm:text-sm"
-                {...register("regLink", {
+                {...register("registerLink", {
                   required: eventErrMsg.regLink.required,
                   pattern: {
                     value: eventErrMsg.regLink.pattern.value,
@@ -532,8 +599,8 @@ export default function EventFormPage({
                   },
                 })}
               />
-              {errors.regLink && (
-                <p className="error-msg mt-1">{errors.regLink.message}</p>
+              {errors.registerLink && (
+                <p className="error-msg mt-1">{errors.registerLink.message}</p>
               )}
             </div>
           </div>
@@ -549,7 +616,7 @@ export default function EventFormPage({
                 variant="outline"
                 size="sm"
                 disabled={fields.length >= 4}
-                onClick={() => append({ type: "", url: "" })}
+                onClick={() => append({ media: "", mediaLink: "" })}
                 className="flex items-center gap-2"
               >
                 <Plus className="w-4 h-4" />
@@ -560,18 +627,18 @@ export default function EventFormPage({
               {fields.map((field, index) => (
                 <div key={field.id} className="flex gap-4 items-start">
                   <div className="flex-1">
-                    <Label htmlFor={`contactChannels.${index}.type`}>
+                    <Label htmlFor={`contactChannels.${index}.media`}>
                       Channel Name
                     </Label>
                     <Controller
-                      name={`contactChannels.${index}.type`}
+                      name={`contactChannels.${index}.media`}
                       control={control}
                       rules={{
                         required: eventErrMsg.contactChannels.type.required,
                       }}
                       render={({ field: { onChange, value } }) => (
                         <Select onValueChange={onChange} value={value}>
-                          <SelectTrigger id={`contactChannels.${index}.type`}>
+                          <SelectTrigger id={`contactChannels.${index}.media`}>
                             <SelectValue placeholder="e.g. Facebook, Twitter, LinkedIn" />
                           </SelectTrigger>
                           <SelectContent>
@@ -584,21 +651,20 @@ export default function EventFormPage({
                         </Select>
                       )}
                     />
-                    {errors.contactChannels?.[index]?.type && (
+                    {errors.contactChannels?.[index]?.media && (
                       <p className="error-msg mt-1">
-                        {
-                          (errors.contactChannels[index].type as FieldError)
-                            ?.message
-                        }
+                        {errors.contactChannels[index].media?.message}
                       </p>
                     )}
                   </div>
                   <div className="flex-1">
-                    <Label htmlFor={`contactChannels.${index}.url`}>URL</Label>
+                    <Label htmlFor={`contactChannels.${index}.mediaLink`}>
+                      URL
+                    </Label>
                     <Input
-                      id={`contactChannels.${index}.url`}
+                      id={`contactChannels.${index}.mediaLink`}
                       placeholder="https://"
-                      {...register(`contactChannels.${index}.url`, {
+                      {...register(`contactChannels.${index}.mediaLink`, {
                         required: eventErrMsg.contactChannels.url.required,
                         pattern: {
                           value: eventErrMsg.contactChannels.url.pattern.value,
@@ -607,9 +673,9 @@ export default function EventFormPage({
                         },
                       })}
                     />
-                    {errors.contactChannels?.[index]?.url && (
+                    {errors.contactChannels?.[index]?.mediaLink && (
                       <p className="error-msg mt-1">
-                        {errors.contactChannels[index].url.message}
+                        {errors.contactChannels[index].mediaLink.message}
                       </p>
                     )}
                   </div>
@@ -655,44 +721,41 @@ export default function EventFormPage({
                   disabled={isSubmitting}
                   className="w-full lg:max-w-[200px]"
                 >
-                  Save
+                  Submit
                 </Button>
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle>Confirm Publication</DialogTitle>
-                    <DialogDescription>
-                      <p className="text-center text-sm text-gray-700">
-                        Are you sure you want to save and publish this event?
-                        This action cannot be undone.
-                      </p>
-
-                      <div className="border-t mt-6 pt-4">
-                        <div className="mx-auto flex justify-between items-center border rounded-lg w-full max-w-xs py-3 px-6 bg-gray-50 shadow-sm hover:shadow-md transition duration-200">
-                          <span className="flex flex-col justify-center  items-center gap-2 text-sm font-medium text-gray-700">
-                            <span className="text-sm">Status:</span>
-                            <span
-                              className={`text-sm font-medium ${
-                                form.watch("status")
-                                  ? "text-green-600"
-                                  : "text-red-500"
-                              }`}
-                            >
-                              {form.watch("status")
-                                ? "Will Be Published"
-                                : "Will Not Publish"}
-                            </span>
-                          </span>
-                          <div className="flex items-center gap-3">
-                            <EventPublishToggle form={form} />
-                          </div>
-                        </div>
-
-                        <p className="text-xs font-light italic text-center mt-3 text-gray-500">
-                          This will publish the event and make it visible to the
-                          public.
-                        </p>
-                      </div>
+                    <DialogDescription className="text-sm text-gray-700">
+                      Are you sure you want to save and publish this event? This
+                      action cannot be undone.
                     </DialogDescription>
+                    <div className="border-t mt-6 pt-4">
+                      <div className="mx-auto flex justify-between items-center border rounded-lg w-full max-w-xs py-3 px-6 bg-gray-50 shadow-sm hover:shadow-md transition duration-200">
+                        <span className="flex flex-col justify-center  items-center gap-2 text-sm font-medium text-gray-700">
+                          <span className="text-sm">Status:</span>
+                          <span
+                            className={`text-sm font-medium ${
+                              form.watch("status")
+                                ? "text-green-600"
+                                : "text-red-500"
+                            }`}
+                          >
+                            {form.watch("status")
+                              ? "Will Be Published"
+                              : "Will Not Publish"}
+                          </span>
+                        </span>
+                        <div className="flex items-center gap-3">
+                          <EventPublishToggle form={form} />
+                        </div>
+                      </div>
+
+                      <div className="text-xs font-light italic text-center mt-3 text-gray-500">
+                        This will publish the event and make it visible to the
+                        public.
+                      </div>
+                    </div>
                   </DialogHeader>
                   <DialogFooter>
                     <Button
@@ -701,8 +764,19 @@ export default function EventFormPage({
                     >
                       Cancel
                     </Button>
-                    <Button type="submit" onClick={handleSubmit(onSubmit)}>
-                      Confirm
+                    <Button
+                      type="submit"
+                      disabled={isSubmitting}
+                      onClick={handleSubmit(onSubmit)}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Loading
+                        </>
+                      ) : (
+                        "Confirm"
+                      )}
                     </Button>
                   </DialogFooter>
                 </DialogContent>

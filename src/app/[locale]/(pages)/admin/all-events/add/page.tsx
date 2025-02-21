@@ -13,8 +13,10 @@ export default function FullAddEventPage() {
     defaultValues: {
       picUrl: "",
       name: "",
-      description: "",
-      location: "",
+      content: "",
+      locationName: "",
+      locationType: "", //
+      audience: "", //
       province: "",
       country: "TH",
       startDate: "",
@@ -23,11 +25,11 @@ export default function FullAddEventPage() {
       endTime: "",
       latitude: "",
       longitude: "",
-      price: "free",
-      regLink: "",
+      priceType: "",
+      registerLink: "",
       status: "",
       categories: [],
-      contactChannels: [{ type: "", url: "" }],
+      contactChannels: [{ media: "", mediaLink: "" }],
     },
   });
   const [isDialogOpen, setIsDialogOpen] = useState(false);

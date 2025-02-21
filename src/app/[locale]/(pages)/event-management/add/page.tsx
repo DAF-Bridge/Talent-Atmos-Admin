@@ -1,20 +1,22 @@
 "use client";
 
+import { createEvent } from "@/features/event-manage/api/action";
 import EventFormPage from "@/features/event-manage/components/EventFormPage";
 import { toast } from "@/hooks/use-toast";
-// import { useRouter } from "@/i18n/routing";
 import { EventFormValues } from "@/lib/types";
+import { base64ToFile } from "@/lib/utils";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 
 export default function AddEventPage() {
-  // const router = useRouter();
   const form = useForm<EventFormValues>({
     defaultValues: {
       picUrl: "",
       name: "",
-      description: "",
-      location: "",
+      content: "",
+      locationName: "",
+      locationType: "", //
+      audience: "", //
       province: "",
       country: "TH",
       startDate: "",
@@ -23,13 +25,14 @@ export default function AddEventPage() {
       endTime: "",
       latitude: "",
       longitude: "",
-      price: "free",
-      regLink: "",
+      priceType: "",
+      registerLink: "",
       status: "",
       categories: [],
-      contactChannels: [{ type: "", url: "" }],
+      contactChannels: [{ media: "", mediaLink: "" }],
     },
   });
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const onSubmit = async (data: EventFormValues) => {
@@ -50,15 +53,56 @@ export default function AddEventPage() {
       return;
     }
 
-    // Close the dialog
-    setIsDialogOpen(false);
+    // Create FormData object
+    const formData = new FormData();
 
-    // If all validations pass, proceed with form submission
+    // Exclude `logo` from `data`
+    const { picUrl, ...otherData } = data;
     console.log(data);
-    toast({
-      title: "Success",
-      description: "Event saved and published successfully!",
+
+    // create image file from base64 string
+    const uniqueFilename = `event_${Date.now()}.png`;
+    const imgFile = base64ToFile(picUrl, uniqueFilename);
+
+    // Append image to FormData
+    if (imgFile instanceof File) {
+      formData.append("image", imgFile);
+    }
+
+    // construct json from other data fields exclude image
+    const jsonData = JSON.stringify({
+      ...otherData,
+      latitude: data.latitude ? Number(data.latitude) : null,
+      longitude: data.longitude ? Number(data.longitude) : null,
     });
+    formData.append("event", jsonData);
+
+    // display all form value
+    formData.forEach((value, key) => {
+      console.log(key, value);
+    });
+
+    try {
+      const result = await createEvent(formData);
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+      toast({
+        title: "Success",
+        description: result.message,
+      });
+      setIsDialogOpen(false);
+    } catch (error: unknown) {
+      console.error(error);
+      if (error instanceof Error) {
+        toast({
+          title: "Failed to create event",
+          variant: "destructive",
+          description: error.toString(),
+        });
+      }
+    }
   };
 
   return (
