@@ -2,6 +2,8 @@ import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin();
 
+const AWS_BUCKET_URL = process.env.AWS_BUCKET_URL || "default-bucket-url";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   async headers() {
@@ -33,7 +35,8 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "anda-daf-bridge.s3.amazonaws.com",
+        hostname: AWS_BUCKET_URL,
+        pathname: "/**", // This allows any path under the bucket
       },
     ], // Allow images from Google Drive
   },
