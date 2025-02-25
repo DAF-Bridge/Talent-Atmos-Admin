@@ -2,6 +2,8 @@ import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin();
 
+const AWS_BUCKET_URL = process.env.AWS_BUCKET_URL || "default-bucket-url";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   async headers() {
@@ -33,10 +35,12 @@ const nextConfig = {
       },
       {
         protocol: "https",
+        pathname: "/**", // This allows any path under the bucket
         hostname: process.env.NEXT_PUBLIC_S3_BUCKET1,
       },
       {
         protocol: "https",
+        pathname: "/**", // This allows any path under the bucket
         hostname: process.env.NEXT_PUBLIC_S3_BUCKET2,
       },
     ],
