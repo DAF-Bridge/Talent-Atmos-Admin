@@ -52,15 +52,15 @@ export type EventFormValues = {
   contactChannels: { media: string; mediaLink: string }[];
 };
 
-export type Organization = {
+export interface OrganizationCardProps {
   id: number;
-  pic_url: string;
   name: string;
   description: string;
-  latitude: number;
-  longitude: number;
-  industry: string[];
-};
+  memberCount: number;
+  eventCount: number;
+  openJobCount: number;
+  picUrl?: string;
+}
 
 export interface JobCardProps {
   id: number;

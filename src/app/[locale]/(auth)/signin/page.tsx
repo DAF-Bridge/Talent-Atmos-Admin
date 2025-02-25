@@ -52,7 +52,7 @@ export default function SigninPage() {
           description: "Signin using email successful",
         });
 
-        window.location.href = "/dashboard";
+        window.location.href = "/my-organizations";
       } else {
         throw new Error(result.error);
       }

@@ -55,7 +55,7 @@ export async function editUserRole(
     const data = await res.json();
     console.log(res.status);
     console.error("API Error:", data);
-    return { success: false, error: data.error, status: res.status };
+    return { success: false, error: data.error ?? data.msg, status: res.status };
   }
 }
 
@@ -123,7 +123,7 @@ export async function inviteCallback(token: string) {
   console.log(apiUrl);
   const res = await fetch(apiUrl, {
     cache: "no-store",
-    method: "GET",
+    method: "POST",
     credentials: "include",
     headers: {
       "Content-Type": "application/json",

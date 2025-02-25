@@ -70,8 +70,8 @@ export default function Home() {
               variant="outline"
               className="w-full sm:w-auto flex items-center justify-center"
             >
-              <Link href="/dashboard">
-                <LogIn className="mr-2 h-4 w-4" /> Enter CMS Console
+              <Link href="/my-organizations">
+                <LogIn className="mr-2 h-4 w-4" /> Your Organization
               </Link>
             </Button>
           </div>

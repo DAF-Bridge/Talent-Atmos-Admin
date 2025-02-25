@@ -6,12 +6,12 @@ export const mainMenu = [
     // Single menu item
     {
       title: "Members",
-      url: "/team-management",
+      url: "team-management",
       icon: User2,
     },
     {
       title: "Jobs",
-      url: "/job-management",
+      url: "job-management",
       icon: Briefcase,
       // items: [
       //   { title: "Draft", url: "/job-management/draft" },
@@ -20,7 +20,7 @@ export const mainMenu = [
     },
     {
       title: "Events",
-      url: "/event-management",
+      url: "event-management",
       icon: Calendar,
       // items: [
       //   { title: "Draft", url: "/event-management/draft" },

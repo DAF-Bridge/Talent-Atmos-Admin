@@ -80,7 +80,7 @@ export function TeamManagement() {
       });
 
       if (!result.success) {
-        throw new Error(result.error.message);
+        throw new Error(result.error);
       }
 
       toast({
@@ -114,6 +114,7 @@ export function TeamManagement() {
         title: "Member removed",
         description: "The member has been removed successfully.",
       });
+      await handleFetchOrgMembers();  
     } catch (error) {
       console.error("Error removing member:", error);
       toast({

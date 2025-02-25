@@ -33,9 +33,13 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "anda-daf-bridge.s3.amazonaws.com",
+        hostname: process.env.NEXT_PUBLIC_S3_BUCKET1,
       },
-    ], // Allow images from Google Drive
+      {
+        protocol: "https",
+        hostname: process.env.NEXT_PUBLIC_S3_BUCKET2,
+      },
+    ],
   },
 };
 

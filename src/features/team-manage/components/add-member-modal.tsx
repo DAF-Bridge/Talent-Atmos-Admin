@@ -39,6 +39,7 @@ export function AddMemberModal({
     setIsSubmitting(true);
     await onAdd(data.email);
     setIsSubmitting(false);
+    onClose();
   };
 
   return (

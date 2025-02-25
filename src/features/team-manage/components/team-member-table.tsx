@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ChevronDown, Loader2 } from "lucide-react";
 import { TeamMember } from "../lib/types";
+import { useAuth } from "@/context/AuthContext";
 
 type TeamMemberTableProps = {
   members: TeamMember[];
@@ -48,6 +49,15 @@ export function TeamMemberTable({
   );
   const [memberToRemove, setMemberToRemove] = useState<TeamMember | null>(null);
   const [isRemoving, setIsRemoving] = useState(false);
+  const { userProfile } = useAuth();
+
+  const isMe = (email: string) => {
+    return email === userProfile?.email;
+  };
+
+  const isMeOwner = () => {
+    return members.find((member) => isMe(member.user.email))?.role === "owner";
+  };
 
   const toggleRole = (role: string) => {
     const newSelectedRoles = new Set(selectedRoles);
@@ -72,6 +82,7 @@ export function TeamMemberTable({
     if (memberToRemove) {
       await onRemoveMember(memberToRemove.user.id);
     }
+    setMemberToRemove(null);
     setIsRemoving(false);
   };
 
@@ -122,25 +133,36 @@ export function TeamMemberTable({
                     <AvatarFallback>{name.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <div className="font-medium">{name}</div>
+                    <div className="font-medium">
+                      {name}
+                      {isMe(email) && (
+                        <span className="ml-2 text-sm font-light text-gray-500">
+                          {"(me)"}
+                        </span>
+                      )}
+                    </div>
                     <div className="text-sm text-gray-500">{email}</div>
                   </div>
                 </TableCell>
                 <TableCell className="capitalize">{member.role}</TableCell>
-                <TableCell className="flex items-center gap-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => setEditingMember(member)}
-                  >
-                    Edit
-                  </Button>
-                  <button
-                    className="border-transparent text-red-500 hover:text-red-600 bg-transparent hover:bg-transparent"
-                    onClick={() => handleRemove(member)}
-                  >
-                    Remove
-                  </button>
-                </TableCell>
+                {isMeOwner() || isMe(email) ? (
+                  <TableCell className="flex items-center gap-4">
+                    <Button
+                      variant="outline"
+                      onClick={() => setEditingMember(member)}
+                    >
+                      Edit
+                    </Button>
+                    <button
+                      className="border-transparent text-red-500 hover:text-red-600 bg-transparent hover:bg-transparent"
+                      onClick={() => handleRemove(member)}
+                    >
+                     { isMe(email) ? "Leave" : "Remove"}
+                    </button>
+                  </TableCell>
+                ) : (
+                  <TableCell></TableCell>
+                )}
               </TableRow>
             );
           })}

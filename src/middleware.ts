@@ -9,12 +9,12 @@ const intlMiddleware = createMiddleware(routing);
 
 // Specify protected routes (including localized versions)
 const protectedRoutes = [
-  // "/org-register",
-  // "/dashboard",
-  // "/team-management",
-  // "/org-management",
-  // "/job-management",
-  // "/event-management",
+  "/org-register",
+  "/dashboard",
+  "/team-management",
+  "/org-management",
+  "/job-management",
+  "/event-management",
   "/admin",
 ];
 

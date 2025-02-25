@@ -25,3 +25,23 @@ export async function createOrg(body: FormData) {
     return { success: false, error: data.error, status: res.status };
   }
 }
+
+export async function getMyOrgs() {
+  const cookieStore = cookies();
+  const apiUrl = formatExternalUrl("/my-orgs");
+  const res = await fetch(apiUrl, {
+    method: "GET",
+    headers: {
+      Cookie: cookieStore.toString(),
+    },
+  });
+
+  const data = await res.json();
+
+  if (res.ok) {
+    return data.organizations;
+  } else {
+    console.error("API Error:", data);
+    return { success: false, error: data.error, status: res.status };
+  }
+}

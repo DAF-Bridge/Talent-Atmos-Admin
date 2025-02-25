@@ -40,6 +40,7 @@ export function EditRoleModal({
     setIsSubmitting(true);
     await onEditRole(id, selectedRole);
     setIsSubmitting(false);
+    onClose();
   };
 
   return (

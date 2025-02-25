@@ -4,63 +4,49 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Users, Calendar, Briefcase, ChevronRight } from "lucide-react";
 import type React from "react";
-
-interface Organization {
-  id: number;
-  name: string;
-  description: string;
-  members: number;
-  eventCount: number;
-  openJobCount: number;
-  imageUrl?: string;
-}
-
-interface OrganizationCardProps {
-  organization: Organization;
-}
+import type { OrganizationCardProps } from "@/lib/types";
 
 export default function OrganizationCard({
-  organization,
-}: Readonly<OrganizationCardProps>) {
+  id,
+  name,
+  description,
+  memberCount,
+  eventCount,
+  openJobCount,
+  picUrl,
+}: 
+Readonly<OrganizationCardProps>) {
   return (
     <Card className="hover:shadow-md transition-shadow duration-300">
       <CardContent className="flex flex-col md:flex-row items-end md:items-center md:justify-between p-6 gap-4">
         <div className="flex items-start sm:items-center space-x-6">
           <Avatar className="h-16 w-16">
-            <AvatarImage src={organization.imageUrl} alt={organization.name} />
-            <AvatarFallback>
-              {organization.name.slice(0, 2).toUpperCase()}
-            </AvatarFallback>
+            <AvatarImage src={picUrl} alt={name} />
+            <AvatarFallback>{name.slice(0, 2).toUpperCase()}</AvatarFallback>
           </Avatar>
           <div className="flex-grow space-y-1">
-            <h3 className="text-xl font-semibold">{organization.name}</h3>
-            <p className="text-sm text-gray-600 line-clamp-2">
-              {organization.description}
-            </p>
+            <h3 className="text-xl font-semibold">{name}</h3>
+            <p className="text-sm text-gray-600 line-clamp-2">{description}</p>
             <div className="flex flex-wrap items-center gap-x-6 pt-2">
               <InfoItem
                 icon={<Users size={18} />}
-                value={organization.members}
+                value={memberCount}
                 label="Members"
               />
               <InfoItem
                 icon={<Calendar size={18} />}
-                value={organization.eventCount}
+                value={eventCount}
                 label="Events"
               />
               <InfoItem
                 icon={<Briefcase size={18} />}
-                value={organization.openJobCount}
+                value={openJobCount}
                 label="Open Jobs"
               />
             </div>
           </div>
         </div>
-        <Link
-          href={`/organization/${organization.id}`}
-          passHref
-          className="w-full md:w-fit"
-        >
+        <Link href={`/${id}/dashboard`} passHref className="w-full md:w-fit">
           <Button
             variant="outline"
             size="sm"
