@@ -44,14 +44,14 @@ export const eventErrMsg = {
   latitude: {
     required: "Latitude is required",
     pattern: {
-      value: /^-?([0-8]?\d|90)(\.\d+)?$/,
+      value: /^-?(?:(?:[0-8]?\d(?:\.\d+)?)|(?:90(?:\.0+)?))$/,
       message: "Invalid latitude",
     },
   },
   longitude: {
     required: "Longitude is required",
     pattern: {
-      value: /^-?([0-8]?\d|90)(\.\d+)?$/,
+      value: /^-?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/,
       message: "Invalid longitude",
     },
   },
