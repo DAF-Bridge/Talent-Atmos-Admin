@@ -21,7 +21,9 @@ import { cn } from "@/lib/utils";
 export function NavMain({
   label,
   items,
+  orgId,
 }: Readonly<{
+  orgId: string;
   label: string;
   items: {
     title: string;
@@ -46,7 +48,7 @@ export function NavMain({
             size="lg"
           >
             <Link
-              href={item.url}
+              href={`/${orgId}/${item.url}`}
               className={cn(
                 "flex items-center justify-start group-data-[collapsible=icon]:justify-center",
                 " w-full h-[42px] border-transparent",

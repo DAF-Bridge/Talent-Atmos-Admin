@@ -133,7 +133,7 @@ export default function FullEventsManagementPage() {
         className={isMobile ? "hidden" : ""}
       >
         <div className="h-full overflow-y-auto p-2">
-          <EventDisplay currentId={currentId} forAdmin />
+          <EventDisplay org={undefined} event={undefined} forAdmin />
         </div>
       </ResizablePanel>
     </ResizablePanelGroup>

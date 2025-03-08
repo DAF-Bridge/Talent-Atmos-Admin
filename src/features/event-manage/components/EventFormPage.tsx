@@ -14,6 +14,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -26,37 +36,37 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { CloudUpload, Loader2, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Controller, useFieldArray, UseFormReturn } from "react-hook-form";
 
 import { EventFormValues } from "@/lib/types";
 import { eventErrMsg } from "@/features/event-manage/config/constants";
-import { alphabeticLength, formatExternalUrl } from "@/lib/utils";
+import { alphabeticLength, fetchCategories } from "@/lib/utils";
 import { EventPublishToggle } from "./publish-toggle";
 import GenericMultipleSelector from "@/components/common/MultiSelectWithSearch";
-import { Option } from "@/components/ui/MultiSelect";
 import { useLocale } from "next-intl";
 
 interface EventFormPageProps {
   form: UseFormReturn<EventFormValues>;
   onSubmit: (data: EventFormValues) => Promise<void>;
   isEditing: boolean;
-  //   onCancel: () => void;
   isDialogOpen: boolean;
   setIsDialogOpen: (isOpen: boolean) => void;
-  //   onDelete: () => Promise<void>;
+  onDelete?: () => Promise<void>;
 }
 
 export default function EventFormPage({
   form,
   onSubmit,
-  //   onCancel,
+  onDelete,
   isEditing,
   isDialogOpen,
   setIsDialogOpen,
 }: Readonly<EventFormPageProps>) {
   const { toast } = useToast();
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [isRemoving, setIsRemoving] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const locale = useLocale();
 
   const {
@@ -75,34 +85,14 @@ export default function EventFormPage({
     name: "contactChannels",
   });
 
-  const fetchCategories = async (value: string): Promise<Option[]> => {
-    try {
-      const apiUrl = formatExternalUrl("/events/categories/list");
-      const response = await fetch(apiUrl);
-      const data = await response.json();
-      const categories = data.categories;
-      if (value) {
-        return categories
-          .filter((industry: { name: string; id: number }) =>
-            industry.name.toLowerCase().includes(value.toLowerCase())
-          )
-          .map((industry: { name: string; id: number }) => ({
-            label: industry.name,
-            value: industry.id,
-          }));
-      } else {
-        return categories.map((industry: { name: string; id: number }) => ({
-          label: industry.name,
-          value: industry.id,
-        }));
-      }
-    } catch (error) {
-      console.error("Error fetching industries:", error);
-      return [];
-    }
-  };
+  useEffect(() => {
+    setLogoPreview(form.getValues("picUrl"));
+  }, [form]);
 
   const validateAndOpenDialog = async () => {
+    // display all form value
+    console.log(form.getValues());
+
     // Trigger all field validations
     const isFormValid = await form.trigger();
 
@@ -122,6 +112,14 @@ export default function EventFormPage({
       if (firstError) {
         firstError.scrollIntoView({ behavior: "smooth", block: "center" });
       }
+    }
+  };
+
+  const handleOnDelete = async () => {
+    if (onDelete) {
+      setIsRemoving(true);
+      await onDelete();
+      setIsRemoving(false);
     }
   };
 
@@ -257,7 +255,7 @@ export default function EventFormPage({
                   </button>
                   <input
                     {...register("picUrl", {
-                      required: eventErrMsg.picUrl.required,
+                      required: isEditing ? false : eventErrMsg.picUrl.required,
                     })}
                     type="file"
                     className="hidden"
@@ -699,9 +697,7 @@ export default function EventFormPage({
               {isEditing && (
                 <Button
                   type="button"
-                  // onClick={() => {
-                  //   onDelete();
-                  // }}
+                  onClick={() => setOpenDeleteDialog(true)}
                   className="flex items-center gap-1 text-red-500 hover:text-red-500 rounded-md
                         border border-transparent hover:border-red-500 hover:bg-transparent bg-transparent shadow-none"
                 >
@@ -709,13 +705,54 @@ export default function EventFormPage({
                   <span>Delete Event</span>
                 </Button>
               )}
+              <AlertDialog open={openDeleteDialog}>
+                <AlertDialogContent className="max-w-md">
+                  <AlertDialogHeader className="space-y-3">
+                    <AlertDialogTitle className="text-lg font-semibold">
+                      Are you sure?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription className="text-base">
+                      You will remove this event permanently.
+                      <p className="mt-1 text-sm font-light italic text-muted-foreground">
+                        (This action cannot be undone.)
+                      </p>
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter className="mt-4">
+                    <AlertDialogCancel
+                      className="w-full sm:w-auto"
+                      disabled={isRemoving}
+                      onClick={() => setOpenDeleteDialog(false)}
+                    >
+                      {"Cancel"}
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleOnDelete}
+                      className="w-full bg-destructive hover:bg-destructive/90 sm:w-auto"
+                      disabled={isRemoving}
+                    >
+                      {isRemoving ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Loading
+                        </>
+                      ) : (
+                        "Confirm"
+                      )}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
             <div className="flex justify-end gap-4 flex-1">
               <Button variant="outline" className="w-full lg:max-w-[200px]">
                 Save as Draft
               </Button>
 
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <Dialog
+                open={isDialogOpen}
+                onOpenChange={(open) => !isSubmitting && setIsDialogOpen(open)}
+              >
                 <Button
                   type="button"
                   onClick={validateAndOpenDialog}
@@ -761,6 +798,7 @@ export default function EventFormPage({
                   <DialogFooter>
                     <Button
                       variant="outline"
+                      disabled={isSubmitting}
                       onClick={() => setIsDialogOpen(false)}
                     >
                       Cancel
@@ -789,25 +827,3 @@ export default function EventFormPage({
     </div>
   );
 }
-
-// defaultValues: {
-//   picUrl: "",
-//   name: "Event1",
-//   description: "asdfghjklzz",
-//   location: "loc1",
-//   province: "กรุงเทพมหานคร",
-//   country: "TH",
-//   startDate: "2025-02-14T17:00:00.000Z", // 15 Feb 2025 UTC+7
-//   endDate: "2025-03-28T17:00:00.000Z", // 29 Mar 2025 UTC+7
-//   startTime: "2025-01-31T23:00:00.000Z", // 6:00 UTC+7
-//   endTime: "2025-02-01T02:00:00.000Z", // 09:00 UTC+7
-//   latitude: "10",
-//   longitude: "10",
-//   price: "free",
-//   regLink: "https://ui.shadcn.com/docs",
-//   isPublished: false,
-//   categories: [{ value: "cate1", label: "cate1" }],
-//   contactChannels: [
-//     { type: "Instagram", url: "https://ui.shadcn.com/docs" },
-//   ],
-// },

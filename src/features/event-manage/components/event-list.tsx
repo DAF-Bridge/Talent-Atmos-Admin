@@ -10,7 +10,7 @@ import { Event } from "@/lib/types";
 import Spinner from "@/components/ui/spinner";
 
 interface EventListProps {
-  events: Event[];
+  events: Event[] | undefined;
   isMobile: boolean;
   currentId?: string | null;
   isLoading?: boolean;
@@ -32,189 +32,21 @@ export default function EventList({
       </div>
     );
   }
-  // const [events, setEvents] = useState<Event[]>([]);
 
-  // const events: Event[] = [
-  //   {
-  //     id: 1,
-  //     name: "1Who Am I - ค้นหาตัวเองผ่านการทดลองทำงานจำลอง",
-  //     startDate: "2024-11-16T00:00:00.000Z",
-  //     endDate: "2024-11-20T00:00:00.000Z",
-  //     startTime: "0001-01-01T09:00:00.000Z",
-  //     endTime: "0001-01-01T16:30:00.000Z",
-  //     locationName: "ลานชั้น 1 อาคารสวทช. โยธี",
-  //     latitude: 19.0305,
-  //     longitude: 99.8926,
-  //     picUrl:
-  //       "https://drive.google.com/uc?export=view&id=1ptEpKRbhtQJxJLdAfmMHOzMJgWfFOl9y",
-  //     category: "All",
-  //     priceType: "Free",
-  //     organization: {
-  //       id: 1,
-  //       name: "Who Am I",
-  //       picUrl:
-  //         "https://drive.google.com/uc?export=view&id=1KDX58e7WJ-JqXFV8_a2_2Z1Jalil4M-H",
-  //     },
-  //   },
-  //   {
-  //     id: 2,
-  //     name: "2WHO AM I - เปิดโอกาสให้น้องๆได้เข้าศึกษาการทำงานและทดลองทำงาน",
-  //     startDate: "",
-  //     endDate: "",
-  //     startTime: "",
-  //     endTime: "",
-  //     locationName: "",
-  //     latitude: 13.7318,
-  //     longitude: 100.5687,
-  //     picUrl:
-  //       "https://drive.google.com/uc?export=view&id=14JD4WbrFIIbAfNt6lbxefsmUrmEFE8Di",
-  //     category: "All",
-  //     priceType: "Free",
-  //     organization: {
-  //       id: 1,
-  //       name: "Who Am I",
-  //       picUrl:
-  //         "https://drive.google.com/uc?export=view&id=1KDX58e7WJ-JqXFV8_a2_2Z1Jalil4M-H",
-  //     },
-  //   },
-  //   {
-  //     id: 3,
-  //     name: "3Who Am I - ค้นหาตัวเองผ่านการทดลองทำงานจำลอง",
-  //     startDate: "2024-11-16T00:00:00.000Z",
-  //     endDate: "2024-11-20T00:00:00.000Z",
-  //     startTime: "0001-01-01T09:00:00.000Z",
-  //     endTime: "0001-01-01T16:30:00.000Z",
-  //     locationName: "ลานชั้น 1 อาคารสวทช. โยธี",
-  //     latitude: 18.7046,
-  //     longitude: 98.9619,
-  //     picUrl:
-  //       "https://drive.google.com/uc?export=view&id=1ptEpKRbhtQJxJLdAfmMHOzMJgWfFOl9y",
-  //     category: "All",
-  //     priceType: "Free",
-  //     organization: {
-  //       id: 1,
-  //       name: "Who Am I",
-  //       picUrl:
-  //         "https://drive.google.com/uc?export=view&id=1KDX58e7WJ-JqXFV8_a2_2Z1Jalil4M-H",
-  //     },
-  //   },
-  //   {
-  //     id: 4,
-  //     name: "4WHO AM I - เปิดโอกาสให้น้องๆได้เข้าศึกษาการทำงานและทดลองทำงาน",
-  //     startDate: "",
-  //     endDate: "",
-  //     startTime: "",
-  //     endTime: "",
-  //     locationName: "",
-  //     latitude: 18.9359,
-  //     longitude: 99.0116,
-  //     picUrl:
-  //       "https://drive.google.com/uc?export=view&id=14JD4WbrFIIbAfNt6lbxefsmUrmEFE8Di",
-  //     category: "All",
-  //     priceType: "Free",
-  //     organization: {
-  //       id: 1,
-  //       name: "Who Am I",
-  //       picUrl:
-  //         "https://drive.google.com/uc?export=view&id=1KDX58e7WJ-JqXFV8_a2_2Z1Jalil4M-H",
-  //     },
-  //   },
-  //   {
-  //     id: 5,
-  //     name: "5Who Am I - ค้นหาตัวเองผ่านการทดลองทำงานจำลอง",
-  //     startDate: "2024-11-16T00:00:00.000Z",
-  //     endDate: "2024-11-20T00:00:00.000Z",
-  //     startTime: "0001-01-01T09:00:00.000Z",
-  //     endTime: "0001-01-01T16:30:00.000Z",
-  //     locationName: "ลานชั้น 1 อาคารสวทช. โยธี",
-  //     latitude: 18.7046,
-  //     longitude: 98.9619,
-  //     picUrl:
-  //       "https://drive.google.com/uc?export=view&id=1ptEpKRbhtQJxJLdAfmMHOzMJgWfFOl9y",
-  //     category: "All",
-  //     priceType: "Free",
-  //     organization: {
-  //       id: 1,
-  //       name: "Who Am I",
-  //       picUrl:
-  //         "https://drive.google.com/uc?export=view&id=1KDX58e7WJ-JqXFV8_a2_2Z1Jalil4M-H",
-  //     },
-  //   },
-  //   {
-  //     id: 6,
-  //     name: "6Who Am I - ค้นหาตัวเองผ่านการทดลองทำงานจำลอง",
-  //     startDate: "2024-11-16T00:00:00.000Z",
-  //     endDate: "2024-11-20T00:00:00.000Z",
-  //     startTime: "0001-01-01T09:00:00.000Z",
-  //     endTime: "0001-01-01T16:30:00.000Z",
-  //     locationName: "ลานชั้น 1 อาคารสวทช. โยธี",
-  //     latitude: 18.7046,
-  //     longitude: 98.9619,
-  //     picUrl:
-  //       "https://drive.google.com/uc?export=view&id=1ptEpKRbhtQJxJLdAfmMHOzMJgWfFOl9y",
-  //     category: "All",
-  //     priceType: "Free",
-  //     organization: {
-  //       id: 1,
-  //       name: "Who Am I",
-  //       picUrl:
-  //         "https://drive.google.com/uc?export=view&id=1KDX58e7WJ-JqXFV8_a2_2Z1Jalil4M-H",
-  //     },
-  //   },
-  //   {
-  //     id: 7,
-  //     name: "7Who Am I - ค้นหาตัวเองผ่านการทดลองทำงานจำลอง",
-  //     startDate: "2024-11-16T00:00:00.000Z",
-  //     endDate: "2024-11-20T00:00:00.000Z",
-  //     startTime: "0001-01-01T09:00:00.000Z",
-  //     endTime: "0001-01-01T16:30:00.000Z",
-  //     locationName: "ลานชั้น 1 อาคารสวทช. โยธี",
-  //     latitude: 18.7046,
-  //     longitude: 98.9619,
-  //     picUrl:
-  //       "https://drive.google.com/uc?export=view&id=1ptEpKRbhtQJxJLdAfmMHOzMJgWfFOl9y",
-  //     category: "All",
-  //     priceType: "Free",
-  //     organization: {
-  //       id: 1,
-  //       name: "Who Am I",
-  //       picUrl:
-  //         "https://drive.google.com/uc?export=view&id=1KDX58e7WJ-JqXFV8_a2_2Z1Jalil4M-H",
-  //     },
-  //   },
-  //   {
-  //     id: 8,
-  //     name: "8Who Am I - ค้นหาตัวเองผ่านการทดลองทำงานจำลอง",
-  //     startDate: "2024-11-16T00:00:00.000Z",
-  //     endDate: "2024-11-20T00:00:00.000Z",
-  //     startTime: "0001-01-01T09:00:00.000Z",
-  //     endTime: "0001-01-01T16:30:00.000Z",
-  //     locationName: "ลานชั้น 1 อาคารสวทช. โยธี",
-  //     latitude: 18.7046,
-  //     longitude: 98.9619,
-  //     picUrl:
-  //       "https://drive.google.com/uc?export=view&id=1ptEpKRbhtQJxJLdAfmMHOzMJgWfFOl9y",
-  //     category: "All",
-  //     priceType: "Free",
-  //     organization: {
-  //       id: 1,
-  //       name: "Who Am I",
-  //       picUrl:
-  //         "https://drive.google.com/uc?export=view&id=1KDX58e7WJ-JqXFV8_a2_2Z1Jalil4M-H",
-  //     },
-  //   },
-  // ];
+  if (events === undefined || events.length === 0) {
+    return (
+      <div className="flex flex-col gap-1 justify-center items-center mt-[200px] w-full">
+        <span className="text-center">No events found</span>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-3">
       {events.map((event) => (
         <div key={event.id}>
           <Link
-            href={
-              isMobile
-                ? `/event-management/edit/${event.id}`
-                : `/event-management?id=${event.id}`
-            }
+            href={isMobile ? `edit/${event.id}` : `?id=${event.id}`}
             className={cn(
               "block border rounded-md p-3 hover:bg-slate-50",
               currentId === `${event.id}` && "bg-gray-200 hover:bg-gray-200"
@@ -234,27 +66,27 @@ export default function EventList({
                 />
               </div>
               <div className="flex flex-col text-left w-full">
-                {event.startDate && (
+                {event.updatedAt && (
                   <p className="text-xs font-base text-muted-foreground line-clamp-1">
                     {"แก้ไขล่าสุด " +
-                      formatRelativeTime(event.startDate, locale)}
+                      formatRelativeTime(event.updatedAt, locale)}
                   </p>
                 )}
                 <h3 className="text-sm font-medium mt-0.5 line-clamp-2">
                   {event.name}
                 </h3>
                 <div className="flex items-center gap-1.5 mt-1.5 text-xs text-gray-600">
-                  <Calendar className="w-3 h-3" />
+                  <Calendar className="shrink-0 w-3 h-3" />
                   <p className="line-clamp-1">
                     {event.startDate
                       ? formatDateRange(event.startDate, event.endDate)
                       : "ไม่ระบุ"}
                   </p>
                 </div>
-                <div className="flex items-center gap-1.5 mt-0.5 text-xs text-gray-600">
-                  <MapPin className="w-3 h-3" />
+                <div className="flex items-center gap-1.5 mt-1.5 text-xs text-gray-600">
+                  <MapPin className="shrink-0 w-3 h-3" />
                   <p className="line-clamp-1">
-                    {event.locationName || "ไม่ระบุ"}
+                    {event.locationName + ", " + event.province}
                   </p>
                 </div>
               </div>

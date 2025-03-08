@@ -55,8 +55,7 @@ export function DatePickerWithRange({
   useEffect(() => {
     if (date?.from) {
       // Set the start date as ISO / UTC
-      const formattedDate = format(date?.from, "dd-MM-yyyy");
-      console.log(formattedDate);
+      const formattedDate = format(date?.from, "yyyy-MM-dd");
       form.setValue("startDate", formattedDate, {
         shouldValidate: true,
       });
@@ -64,8 +63,7 @@ export function DatePickerWithRange({
 
     if (date?.to) {
       // Set the end date as ISO / UTC
-      const formattedDate = format(date?.to, "dd-MM-yyyy");
-      console.log(formattedDate);
+      const formattedDate = format(date?.to, "yyyy-MM-dd");
       form.setValue("endDate", formattedDate, {
         shouldValidate: true,
       });

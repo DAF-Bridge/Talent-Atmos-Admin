@@ -10,15 +10,14 @@ export default function OrganizationCard({
   id,
   name,
   description,
-  memberCount,
-  eventCount,
-  openJobCount,
+  numberOfEvents,
+  numberOfMembers,
+  numberOfOpenJobs,
   picUrl,
-}: 
-Readonly<OrganizationCardProps>) {
+}: Readonly<OrganizationCardProps>) {
   return (
     <Card className="hover:shadow-md transition-shadow duration-300">
-      <CardContent className="flex flex-col md:flex-row items-end md:items-center md:justify-between p-6 gap-4">
+      <CardContent className="flex flex-col md:flex-row justify-between md:items-center md:justify-between p-6 gap-4">
         <div className="flex items-start sm:items-center space-x-6">
           <Avatar className="h-16 w-16">
             <AvatarImage src={picUrl} alt={name} />
@@ -30,17 +29,17 @@ Readonly<OrganizationCardProps>) {
             <div className="flex flex-wrap items-center gap-x-6 pt-2">
               <InfoItem
                 icon={<Users size={18} />}
-                value={memberCount}
+                value={numberOfMembers}
                 label="Members"
               />
               <InfoItem
                 icon={<Calendar size={18} />}
-                value={eventCount}
+                value={numberOfEvents}
                 label="Events"
               />
               <InfoItem
                 icon={<Briefcase size={18} />}
-                value={openJobCount}
+                value={numberOfOpenJobs}
                 label="Open Jobs"
               />
             </div>

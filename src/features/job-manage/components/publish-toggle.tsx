@@ -18,7 +18,7 @@ export const JobPublishToggle = ({
             id="publish-toggle"
             checked={field.value === "published"}
             onCheckedChange={(checked) =>
-              field.onChange(checked ? "published" : "")
+              field.onChange(checked ? "published" : "draft")
             }
           />
         )}

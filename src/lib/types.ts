@@ -18,16 +18,16 @@ export interface Event {
     name: string;
     picUrl: string;
   };
-}
-
-export interface EventDescription extends Event {
-  content: {
-    html: string;
-  };
+  content: string;
   province: string;
+  country: string;
   locationType: string;
   audience: string;
   status: "draft" | "published" | "";
+  registerLink: string;
+  updatedAt: string;
+  categories: { label: string; value: string }[];
+  contactChannels: { media: string; mediaLink: string }[];
 }
 
 export type EventFormValues = {
@@ -56,58 +56,61 @@ export interface OrganizationCardProps {
   id: number;
   name: string;
   description: string;
-  memberCount: number;
-  eventCount: number;
-  openJobCount: number;
+  numberOfMembers: number;
+  numberOfEvents: number;
+  numberOfOpenJobs: number;
   picUrl?: string;
 }
 
-export interface JobCardProps {
+export interface JobProps {
   id: number;
   title: string;
   description: string;
-  workplace: "remote" | "onsite" | "hybrid";
-  work_type: "fulltime" | "parttime" | "volunteer" | "internship";
-  career_stage: "entrylevel" | "midlevel" | "senior";
-  hoursPerDay: string;
+  orgPicUrl: string;
+  scope: string;
+  prerequisite: {
+    value: number;
+    title: string;
+    link: string;
+  }[];
+  workplace: string;
+  workType: string;
+  careerStage: string;
   period: string;
+  qualifications: string;
   quantity: number;
+  salary: number;
   province: string;
   country: string;
-  salary: number;
-  imgUrl?: string;
-  UpdatedAt: string;
-  orgName?: string;
-  industry: string[];
-}
-
-export interface JobDescriptionPage extends JobCardProps {
-  scope: string;
-  prerequisite: { name: string; url: string }[];
-  workplaceDesc?: string;
-  qualifications: string;
-  benefits: string;
+  status: string;
+  registerLink: string;
+  categories: {
+    value: number;
+    label: string;
+  }[];
+  updatedAt: string;
 }
 
 export type JobFormValues = {
-  id: number;
-  UpdatedAt: string;
   title: string;
   scope: string;
-  prerequisite: { name: string; url: string }[];
-  workplace: "remote" | "onsite" | "hybrid";
-  work_type: "fulltime" | "parttime" | "volunteer" | "internship";
-  career_stage: "entrylevel" | "midlevel" | "senior";
+  prerequisite: {
+    title: string;
+    link: string;
+  }[];
+  location: string;
+  workplace: "remote" | "onsite" | "hybrid" | "";
+  workType: "fulltime" | "parttime" | "volunteer" | "internship" | "";
+  careerStage: "entrylevel" | "midlevel" | "senior" | "";
   period: string;
   description: string;
-  hours_per_day: string;
   qualifications: string;
-  benefits: string;
   quantity: number;
   salary: number;
-  location: string;
-  responsibilities: string;
+  province: string;
+  country: string;
   status: "draft" | "published" | "";
+  categories: [{ label: string; value: string }];
 };
 
 export type AuthContextType = {
@@ -119,7 +122,6 @@ export type AuthContextType = {
 };
 
 export type UserProfile = {
-  id: number; // userID
   firstName: string;
   lastName: string;
   email: string;

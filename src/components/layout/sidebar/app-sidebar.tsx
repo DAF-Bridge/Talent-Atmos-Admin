@@ -13,19 +13,34 @@ import OrgSwitcher from "./org-switcher";
 import NavUser from "./nav-user";
 import { NavMain } from "./nav-main";
 import { mainLabel, mainMenu } from "./config/main-config";
-import { adminLabel, adminMenu } from "./config/admin-config";
 
-export function AppSidebar() {
+interface AppSidebarProps {
+  orgName: string;
+  orgPic: string;
+  isLoading: boolean;
+  orgId: string;
+}
+
+export function AppSidebar({
+  orgId,
+  orgName,
+  orgPic,
+  isLoading,
+}: Readonly<AppSidebarProps>) {
   const { state } = useSidebar();
   return (
     <TooltipProvider>
       <Sidebar collapsible="icon" className="border-none">
         <SidebarHeader className="flex items-end gap-4 mt-2">
-          <OrgSwitcher orgName="Acme Inc." role="Admin" state={state} />
+          <OrgSwitcher
+            orgName={orgName}
+            state={state}
+            orgPic={orgPic}
+            isLoading={isLoading}
+          />
         </SidebarHeader>
         <SidebarContent>
-          <NavMain items={mainMenu} label={mainLabel} />
-          <NavMain items={adminMenu} label={adminLabel} />
+          <NavMain items={mainMenu} label={mainLabel} orgId={orgId} />
         </SidebarContent>
         <SidebarFooter>
           <NavUser />

@@ -14,7 +14,6 @@ import {
   CalendarIcon,
   UserIcon,
   BriefcaseIcon,
-  TrendingUpIcon,
 } from "lucide-react";
 import {
   Bar,
@@ -70,13 +69,15 @@ export default function DashboardPage() {
   return (
     <div className="flex-1 space-y-4 p-8 pt-6 h-full overflow-y-scroll">
       <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">{greeting}, {userProfile?.firstName}</h2>
+        <h2 className="text-3xl font-bold tracking-tight">
+          {greeting}, {userProfile?.firstName}
+        </h2>
         <div className="flex items-center space-x-2">
           <Button>Download Report</Button>
         </div>
       </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+      <div className="flex flex-col lg:flex-row gap-4">
+        <Card className="flex-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Total Employees
@@ -85,12 +86,12 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">1,234</div>
-            <p className="text-xs text-muted-foreground">
+            {/* <p className="text-xs text-muted-foreground">
               +10% from last month
-            </p>
+            </p> */}
           </CardContent>
         </Card>
-        <Card>
+        <Card className="flex-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Open Positions
@@ -99,24 +100,22 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">23</div>
-            <p className="text-xs text-muted-foreground">+2 new this week</p>
+            {/* <p className="text-xs text-muted-foreground">+2 new this week</p> */}
           </CardContent>
         </Card>
-        <Card>
+        <Card className="flex-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Upcoming Events
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Lived Events</CardTitle>
             <CalendarIcon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">7</div>
-            <p className="text-xs text-muted-foreground">
+            {/* <p className="text-xs text-muted-foreground">
               Next event in 3 days
-            </p>
+            </p> */}
           </CardContent>
         </Card>
-        <Card>
+        {/* <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Employee Satisfaction
@@ -129,7 +128,7 @@ export default function DashboardPage() {
               +5% from last quarter
             </p>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-4">

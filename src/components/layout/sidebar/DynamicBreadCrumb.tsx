@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -14,7 +14,7 @@ import { useLocale } from "next-intl";
 
 export function DynamicBreadcrumb() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
+  // const searchParams = useSearchParams()
   const [mounted, setMounted] = useState(false);
   const locale = useLocale();
 
@@ -26,49 +26,76 @@ export function DynamicBreadcrumb() {
     return null; // Return null on the server-side and first render on the client
   }
 
-  // Remove the base path ('/th' & '/en') and split the remaining path
-  const paths = pathname
-    .replace(/^\/(th|en)/, "")
-    .split("/")
-    .filter((path) => path && isNaN(Number(path))); // Filter out numeric segments
+  // Remove the base path ('/th' & '/en')
+  const pathWithoutLocale = pathname.replace(/^\/(th|en)/, "");
 
-  // Function to generate href
-  const generateHref = (index: number) => {
-    const href = `/${locale}/` + paths.slice(0, index + 1).join("/");
-    const id = searchParams.get("id");
-    return id ? `${href}?id=${id}` : href;
-  };
+  // Split the path into segments
+  const pathSegments = pathWithoutLocale.split("/").filter(Boolean);
+
+  // Create a structure that preserves the full path
+  const breadcrumbItems = [];
+  let currentPath = `/${locale}`;
+
+  // Process each segment to build breadcrumb items
+  for (let i = 0; i < pathSegments.length; i++) {
+    const segment = pathSegments[i];
+
+    // Skip the numeric ID at the beginning if it exists
+    if (i === 0 && !isNaN(Number(segment))) {
+      currentPath += `/${segment}`;
+      continue;
+    }
+
+    // Add the segment to the current path
+    currentPath += `/${segment}`;
+
+    // For "edit" followed by an ID, we want to keep them together
+    if (
+      segment === "edit" &&
+      i + 1 < pathSegments.length &&
+      !isNaN(Number(pathSegments[i + 1]))
+    ) {
+      // const editWithId = `${segment} ${pathSegments[i + 1]}`
+      breadcrumbItems.push({
+        text: formatText(segment),
+        href: currentPath + `/${pathSegments[i + 1]}`,
+        isLast: i + 1 === pathSegments.length - 1,
+      });
+      i++; // Skip the next segment (the ID)
+    } else {
+      breadcrumbItems.push({
+        text: formatText(segment),
+        href: currentPath,
+        isLast: i === pathSegments.length - 1,
+      });
+    }
+  }
 
   // Function to format breadcrumb item text
-  const formatText = (text: string) => {
+  function formatText(text: string) {
     return text
       .split("-")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
-  };
+  }
 
-  if (paths.length === 0) {
+  if (breadcrumbItems.length === 0) {
     return null; // Don't render anything if there are no paths
   }
 
   return (
     <Breadcrumb>
       <BreadcrumbList>
-        {paths.map((path, index) => {
-          const href = generateHref(index);
-          const isLast = index === paths.length - 1;
-
-          return (
-            <BreadcrumbItem key={path}>
-              {paths.length > 1 && index > 0 && <BreadcrumbSeparator />}
-              {isLast ? (
-                <BreadcrumbPage>{formatText(path)}</BreadcrumbPage>
-              ) : (
-                <BreadcrumbLink href={href}>{formatText(path)}</BreadcrumbLink>
-              )}
-            </BreadcrumbItem>
-          );
-        })}
+        {breadcrumbItems.map((item, index) => (
+          <BreadcrumbItem key={index}>
+            {index > 0 && <BreadcrumbSeparator />}
+            {item.isLast ? (
+              <BreadcrumbPage>{item.text}</BreadcrumbPage>
+            ) : (
+              <BreadcrumbLink href={item.href}>{item.text}</BreadcrumbLink>
+            )}
+          </BreadcrumbItem>
+        ))}
       </BreadcrumbList>
     </Breadcrumb>
   );

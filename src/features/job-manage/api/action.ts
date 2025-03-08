@@ -2,20 +2,22 @@
 
 import { cookies } from "next/headers";
 import { formatExternalUrl } from "@/lib/utils";
+import { JobFormValues } from "@/lib/types";
 
-export async function createEvent(orgId: string, body: FormData) {
-  console.log("create event");
+export async function createJob(orgId: string, body: JobFormValues) {
+  console.log("create job");
   const cookieStore = cookies();
-  const apiUrl = formatExternalUrl(`/orgs/${orgId}/events/create`);
+  const apiUrl = formatExternalUrl(`/orgs/${orgId}/jobs/create`);
   console.log(body);
   const res = await fetch(apiUrl, {
     method: "POST",
-    body: body,
+    body: JSON.stringify(body),
     headers: {
+      "Content-Type": "application/json",
       Cookie: cookieStore.toString(),
     },
   });
-  console.log("created event res", res);
+  console.log("created job res", res);
   if (res.ok) {
     const data = await res.json();
     return { success: true, message: data.message, status: res.status };
@@ -26,40 +28,13 @@ export async function createEvent(orgId: string, body: FormData) {
   }
 }
 
-export async function updateEvent(
-  orgId: string,
-  eventId: string,
-  body: FormData
-) {
-  console.log("update event");
-  const cookieStore = cookies();
-  const apiUrl = formatExternalUrl(`/orgs/${orgId}/events/${eventId}`);
-  console.log(apiUrl);
-  console.log(body);
-  const res = await fetch(apiUrl, {
-    method: "PUT",
-    body: body,
-    headers: {
-      Cookie: cookieStore.toString(),
-    },
-  });
-  console.log("updated event res", res);
-  if (res.ok) {
-    const data = await res.json();
-    return { success: true, message: data.message, status: res.status };
-  } else {
-    const data = await res.json();
-    console.error("API Error:", data);
-    return { success: false, error: data.error, status: res.status };
-  }
-}
-
-export async function getAllEventsByOrgId(orgId: string | null) {
+export async function getAllJobsByOrgId(orgId: string | null) {
   if (orgId === null) return { success: false, error: "orgId is null" };
 
   const cookieStore = cookies();
-  console.log("cookies: ", JSON.stringify(cookies));
-  const apiUrl = formatExternalUrl(`/orgs/${orgId}/events`);
+  // console.log("cookies: ", cookieStore.toString());
+  const apiUrl = formatExternalUrl(`/orgs/${orgId}/jobs/list`);
+  // console.log(apiUrl);
   const res = await fetch(apiUrl, {
     method: "GET",
     headers: {
@@ -68,21 +43,22 @@ export async function getAllEventsByOrgId(orgId: string | null) {
   });
 
   const data = await res.json();
+  console.log("sever action data: " + data);
 
   if (res.ok) {
     if (data) {
       return { success: true, data: data, status: res.status };
     }
-    return { success: true, data: [], status: res.status };
+    return { success: false, data: [], status: res.status };
   } else {
     console.error("API Error:", data);
     return { success: false, error: data.error, status: res.status };
   }
 }
 
-export async function getOrgEventById(orgId: string, eventId: string) {
+export async function getOrgJobById(orgId: string, jobId: string) {
   const cookieStore = cookies();
-  const apiUrl = formatExternalUrl(`/orgs/${orgId}/events/${eventId}`);
+  const apiUrl = formatExternalUrl(`/orgs/${orgId}/jobs/get/${jobId}`);
   const res = await fetch(apiUrl, {
     method: "GET",
     headers: {
@@ -91,6 +67,7 @@ export async function getOrgEventById(orgId: string, eventId: string) {
   });
 
   const data = await res.json();
+  console.log("sever action data: " + data);
 
   if (res.ok) {
     return { success: true, data: data, status: res.status };
@@ -100,9 +77,9 @@ export async function getOrgEventById(orgId: string, eventId: string) {
   }
 }
 
-export async function deleteEvent(orgId: string, eventId: string) {
+export async function deleteJob(orgId: string, jobId: string) {
   const cookieStore = cookies();
-  const apiUrl = formatExternalUrl(`/orgs/${orgId}/events/${eventId}`);
+  const apiUrl = formatExternalUrl(`orgs/${orgId}/jobs/delete/${jobId}`);
   const res = await fetch(apiUrl, {
     method: "DELETE",
     headers: {
@@ -111,6 +88,7 @@ export async function deleteEvent(orgId: string, eventId: string) {
   });
   if (res.ok) {
     const data = await res.json();
+    console.log("deleted job res", res);
     return { success: true, message: data.message, status: res.status };
   } else {
     const data = await res.json();

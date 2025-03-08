@@ -45,3 +45,23 @@ export async function getMyOrgs() {
     return { success: false, error: data.error, status: res.status };
   }
 }
+
+export async function getOrgById(orgId: string) {
+  const cookieStore = cookies();
+  const apiUrl = formatExternalUrl(`/orgs/get/${orgId}`);
+  const res = await fetch(apiUrl, {
+    method: "GET",
+    headers: {
+      Cookie: cookieStore.toString(),
+    },
+  });
+
+  const data = await res.json();
+
+  if (res.ok) {
+    return { success: true, data: data, status: res.status };
+  } else {
+    console.error("API Error:", data);
+    return { success: false, error: data.error, status: res.status };
+  }
+}

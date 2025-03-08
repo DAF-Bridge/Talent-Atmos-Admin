@@ -1,7 +1,8 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { th, enUS } from "date-fns/locale";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, isSameDay } from "date-fns";
+import { Option } from "@/components/ui/MultiSelect";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -51,7 +52,7 @@ export const formatDateRange = (
     });
   };
 
-  if (end === "" || start.getDate() === end.getDate()) {
+  if (end === "" || isSameDay(start, end)) {
     return formatDate(start);
   }
 
@@ -63,13 +64,13 @@ export const formatTimeRange = (
   endTime?: string
 ): string => {
   const formatTime = (isoTime: string): string => {
-    const date = new Date(isoTime);
+    const date = new Date(`1970-01-01T${isoTime}Z`); // Prepend date to ensure valid parsing
 
     return date.toLocaleTimeString("en-US", {
       hour: "2-digit",
       minute: "2-digit",
       hour12: false,
-      timeZone: "UTC",
+      timeZone: "UTC", // Keep it in UTC to prevent unwanted timezone shifts
     });
   };
 
@@ -124,7 +125,6 @@ export const alphabeticLength = (value: string) => {
 // 2024-11-16 00:00:00+00 for database
 // 2024-11-16T00:00:00.000Z for api call
 
-
 export function base64ToFile(base64String: string, filename: string): File {
   const arr = base64String.split(",");
   if (arr.length !== 2) {
@@ -147,3 +147,30 @@ export function base64ToFile(base64String: string, filename: string): File {
 
   return new File([u8arr], filename, { type: mime });
 }
+
+export const fetchCategories = async (value: string): Promise<Option[]> => {
+  try {
+    const apiUrl = formatExternalUrl("/events/categories/list");
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+    const categories = data.categories;
+    if (value) {
+      return categories
+        .filter((category: { label: string; value: number }) =>
+          category.label.toLowerCase().includes(value.toLowerCase())
+        )
+        .map((category: { label: string; value: number }) => ({
+          label: category.label,
+          value: category.value,
+        }));
+    } else {
+      return categories.map((category: { label: string; value: number }) => ({
+        label: category.label,
+        value: category.value,
+      }));
+    }
+  } catch (error) {
+    console.error("Error fetching industries:", error);
+    return [];
+  }
+};

@@ -3,20 +3,24 @@
 import { createEvent } from "@/features/event-manage/api/action";
 import EventFormPage from "@/features/event-manage/components/EventFormPage";
 import { toast } from "@/hooks/use-toast";
+import { useRouter } from "@/i18n/routing";
 import { EventFormValues } from "@/lib/types";
 import { base64ToFile } from "@/lib/utils";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 
-export default function AddEventPage() {
+export default function AddEventPage({
+  params,
+}: Readonly<{ params: { orgId: string } }>) {
+  const router = useRouter();
   const form = useForm<EventFormValues>({
     defaultValues: {
       picUrl: "",
       name: "",
       content: "",
       locationName: "",
-      locationType: "", //
-      audience: "", //
+      locationType: "",
+      audience: "",
       province: "",
       country: "TH",
       startDate: "",
@@ -27,7 +31,7 @@ export default function AddEventPage() {
       longitude: "",
       priceType: "",
       registerLink: "",
-      status: "",
+      status: "draft",
       categories: [],
       contactChannels: [{ media: "", mediaLink: "" }],
     },
@@ -83,7 +87,7 @@ export default function AddEventPage() {
     });
 
     try {
-      const result = await createEvent(formData);
+      const result = await createEvent(params.orgId, formData);
 
       if (!result.success) {
         throw new Error(result.error);
@@ -92,6 +96,8 @@ export default function AddEventPage() {
         title: "Success",
         description: result.message,
       });
+
+      router.push(`/${params.orgId}/event-management`);
       setIsDialogOpen(false);
     } catch (error: unknown) {
       console.error(error);

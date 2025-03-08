@@ -1,67 +1,39 @@
 import { Button } from "@/components/ui/button";
 import StaticMap from "@/components/ui/StaticMap";
-// import { EventDescriptionProps } from "@/lib/types";
-import {
-  formatDateRange,
-  formatExternalUrl,
-  formatTimeRange,
-} from "@/lib/utils";
+import { formatDateRange, formatTimeRange } from "@/lib/utils";
 import Image from "next/image";
 import {
   IoCalendarSharp,
   IoLocationSharp,
-  // IoPricetagOutline,
   IoTimeOutline,
 } from "react-icons/io5";
 import { MdOutlineEdit } from "react-icons/md";
 import { Link } from "@/i18n/routing";
-import { useEffect, useState } from "react";
-import Spinner from "@/components/ui/spinner";
-import { EventDescription } from "@/lib/types";
+import { Event } from "@/lib/types";
 import parse, {
   domToReact,
   HTMLReactParserOptions,
   Element,
   DOMNode,
 } from "html-react-parser";
+import { Organization } from "@/features/team-manage/lib/types";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface EventDisplayProps {
+  org: Organization | undefined;
+  event: Event | undefined;
   forAdmin?: boolean;
-  currentId: string | null;
 }
 
 export default function EventDisplay({
+  org,
+  event,
   forAdmin,
-  currentId,
 }: Readonly<EventDisplayProps>) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [event, setEvent] = useState<EventDescription | null>(null);
-
-  useEffect(() => {
-    const fetchJob = async () => {
-      try {
-        setIsLoading(true);
-        const response = await fetch(
-          formatExternalUrl(`/orgs/1/events/${currentId}`)
-        );
-        const data = await response.json();
-        console.log(data);
-        setEvent(data);
-      } catch (error) {
-        console.error("Error fetching job:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchJob();
-  }, [currentId]);
-
-  if (!event || !currentId || isLoading || !event.content?.html) {
+  if (!event) {
     return (
       <div className="flex flex-col gap-1 justify-center items-center h-full w-full">
-        <Spinner />
-        <span className="text-center">Loading...</span>
+        <span className="text-center">Choose an event</span>
       </div>
     );
   }
@@ -99,65 +71,6 @@ export default function EventDisplay({
     },
   };
 
-  // Mock data
-  // const mockEvent = {
-  //   id: 1,
-  //   name: "Web Development Workshop 2024",
-  //   description:
-  //     "Join us for an intensive 3-day workshop covering modern web development practices, from frontend to backend technologies. Participants will learn through hands-on exercises and real-world projects.",
-  //   startDate: "2024-11-16T00:00:00.000Z",
-  //   endDate: "2024-11-20T00:00:00.000Z",
-  //   startTime: "0001-01-01T09:00:00.000Z",
-  //   endTime: "0001-01-01T16:30:00.000Z",
-  //   price: "Free",
-  //   picUrl:
-  //     "https://drive.google.com/uc?export=view&id=1ptEpKRbhtQJxJLdAfmMHOzMJgWfFOl9y",
-  //   highlight:
-  //     "Learn from industry experts and get hands-on experience with real-world projects. Network with fellow developers and gain practical skills.",
-  //   requirements:
-  //     "Basic understanding of HTML, CSS, and JavaScript. Participants should bring their own laptop.",
-  //   outcomes: [
-  //     "Understanding of modern web frameworks",
-  //     "Backend development skills",
-  //     "Database management knowledge",
-  //   ],
-  //   timeline: [
-  //     { date: "2024-02-01", content: "Introduction to Frontend Development" },
-  //     { date: "2024-02-02", content: "Backend Technologies and APIs" },
-  //     { date: "2024-02-03", content: "Project Development and Deployment" },
-  //   ],
-  //   benefits: [
-  //     "Certificate of completion",
-  //     "Project portfolio",
-  //     "Networking opportunities",
-  //     "Job placement assistance",
-  //   ],
-  //   location: {
-  //     name: "Bangkok Innovation Hub",
-  //     map_url: "https://maps.example.com",
-  //     image_url: "/api/placeholder/200/200",
-  //     lat: 13.7563,
-  //     lng: 100.5018,
-  //   },
-  //   contact: [
-  //     {
-  //       type: "facebook",
-  //       url: "https://www.facebook.com/WHOAMIPROJECT",
-  //     },
-  //     {
-  //       type: "instagram",
-  //       url: "@whoami",
-  //     },
-  //   ],
-  //   regLink: "https://forms.gle/gDhZXQuZunsmzACZ6",
-  //   organization: {
-  //     id: 1,
-  //     name: "Tech Community Thailand",
-  //     picUrl:
-  //       "https://drive.google.com/uc?export=view&id=1KDX58e7WJ-JqXFV8_a2_2Z1Jalil4M-H",
-  //   },
-  // };
-
   return (
     <div className="h-full overflow-y-auto bg-white min-w-[750px]">
       <div className="sticky top-0 z-10 bg-white/70 backdrop-blur flex justify-between items-center px-4 pb-2">
@@ -165,7 +78,7 @@ export default function EventDisplay({
           ตัวอย่างหน้า
         </p>
         <Link
-          href={`/${forAdmin ? "all-events" : "event-management"}/edit/${
+          href={`${forAdmin ? "/all-events" : "event-management"}/edit/${
             event.id
           }`}
         >
@@ -194,22 +107,17 @@ export default function EventDisplay({
           {/* Right side - Event Details */}
           <div className="flex-1 min-w-0">
             {/* Organization Info */}
-            <div className="flex items-center gap-2 mb-4">
-              <div className="shrink-0 h-8 w-8 rounded-full overflow-hidden shadow">
-                <Image
-                  src={
-                    "https://drive.google.com/uc?export=view&id=1KDX58e7WJ-JqXFV8_a2_2Z1Jalil4M-H"
-                  }
-                  width={40}
-                  height={40}
-                  alt="org-logo"
-                  className="object-cover w-full h-full"
-                />
+            {org && (
+              <div className="flex items-center gap-2 mb-4">
+                <Avatar className="h-10 w-10 rounded-full border">
+                  <AvatarImage src={org.picUrl} alt={org.name} />
+                  <AvatarFallback>
+                    {org.name.slice(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="text-sm font-medium truncate">{org.name}</span>
               </div>
-              <span className="text-sm font-medium truncate">
-                {"Tech Community Thailand"}
-              </span>
-            </div>
+            )}
             {/* Event Title */}
             <h1 className="text-2xl font-semibold mb-4 line-clamp-2">
               {event.name}
@@ -240,10 +148,10 @@ export default function EventDisplay({
               </div>
             </div>
             {/* Registration Button - Moved up */}
-            {/* {event.regLink && (
+            {event.registerLink && (
               <div className="mt-6">
                 <a
-                  href={event.regLink}
+                  href={event.registerLink}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-block px-6 bg-orange-500 text-white text-center py-2.5 rounded-lg hover:bg-orange-600 transition-colors"
@@ -251,7 +159,7 @@ export default function EventDisplay({
                   ลงทะเบียน
                 </a>
               </div>
-            )} */}
+            )}
           </div>
         </div>
 
@@ -259,7 +167,7 @@ export default function EventDisplay({
         <div className="space-y-6 border-t pt-6">
           <div>
             <h2 className="text-xl font-semibold mb-2">คำอธิบายกิจกรรม</h2>
-            <div>{parse(event.content.html, options)}</div>
+            <div>{parse(event.content, options)}</div>
           </div>
 
           {/* <div>
@@ -284,28 +192,28 @@ export default function EventDisplay({
             </div>
           </div>
 
-          {/* <div>
+          <div>
             <h2 className="text-xl font-semibold mb-2">ช่องทางติดต่อสอบถาม</h2>
-            {event.contact.map((item, index) => (
+            {event.contactChannels.map((item, index) => (
               <div key={index} className="flex gap-2 text-gray-700">
-                <span className="font-medium">{item.type}:</span>
-                {item.url.includes("http") ? (
+                <span className="font-medium">{item.media}:</span>
+                {item.mediaLink.includes("http") ? (
                   <a
-                    href={item.url}
+                    href={item.mediaLink}
                     target="_blank"
                     rel="noreferrer"
                     className="underline hover:text-gray-inactive break-words whitespace-normal"
                   >
-                    {item.url}
+                    {item.mediaLink}
                   </a>
                 ) : (
                   <span className="break-words whitespace-normal">
-                    {item.url}
+                    {item.mediaLink}
                   </span>
                 )}
               </div>
             ))}
-          </div> */}
+          </div>
         </div>
       </div>
     </div>

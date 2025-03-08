@@ -1,49 +1,107 @@
 "use client";
 
-// import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { JobFormValues } from "@/lib/types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import JobFormPage from "@/features/job-manage/components/JobFormPage";
 import { toast } from "@/hooks/use-toast";
+import { deleteJob, getOrgJobById } from "@/features/job-manage/api/action";
+import Spinner from "@/components/ui/spinner";
+import { useRouter } from "@/i18n/routing";
 
 export default function EditJobPage({
-  // params,
-}: Readonly<{ params: { id: string } }>) {
-  // const router = useRouter();
+  params,
+}: Readonly<{ params: { orgId: string; id: string } }>) {
+  const orgId = params.orgId;
+  const jobId = params.id;
+  const router = useRouter();
+  const [initialValues, setInitialValues] = useState<JobFormValues | null>(
+    null
+  );
+  const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const form = useForm<JobFormValues>();
+  const form = useForm<JobFormValues>({
+    defaultValues: initialValues || {
+      title: "",
+      scope: "",
+      prerequisite: [],
+      location: "",
+      workplace: "",
+      workType: "",
+      careerStage: "",
+      period: "",
+      description: "",
+      qualifications: "",
+      quantity: 0,
+      salary: 0,
+      province: "",
+      country: "",
+      status: "draft",
+      categories: [],
+    },
+  });
 
-  //   useEffect(() => {
-  //     const fetchJob = async () => {
-  //       try {
-  //         setIsLoading(true);
-  //         const response = await fetch(
-  //           formatInternalUrl(`/api/org/1/get-job/${params.id}`)
-  //         );
+  // Fetch event data from the server
+  useEffect(() => {
+    const fetchJob = async () => {
+      setIsLoading(true);
+      try {
+        const result = await getOrgJobById(orgId, jobId);
+        const event = result.data;
+        console.log(event);
 
-  //         if (!response.ok) {
-  //           throw new Error("Failed to fetch job");
-  //         }
+        // Transform the data if necessary
+        const formattedJob: JobFormValues = {
+          ...event,
+          startDate: event.startDate
+            ? new Date(event.startDate).toISOString().split("T")[0]
+            : "",
+          endDate: event.endDate
+            ? new Date(event.endDate).toISOString().split("T")[0]
+            : "",
+          // Add any other necessary transformations here
+        };
 
-  //         const job = await response.json();
+        setInitialValues(formattedJob);
+        form.reset(formattedJob);
+      } catch (error) {
+        console.error("Failed to fetch job:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load job data. Please try again.",
+        });
+        router.push(`/${orgId}/job-management`);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchJob();
+  }, [orgId, jobId, form, router]);
 
-  //         // Set form values for each field
-  //         Object.keys(job).forEach((key) => {
-  //           form.setValue(key as keyof JobFormValues, job[key]);
-  //         });
-  //       } catch (error) {
-  //         console.error("Failed to fetch job details");
-  //         toast.error("Failed to load job details");
-  //         router.push("/job-management");
-  //       } finally {
-  //         setIsLoading(false);
-  //       }
-  //     };
+  const onDelete = async () => {
+    try {
+      const result = await deleteJob(orgId, jobId);
 
-  //     fetchJob();
-  //   }, [params.id, form, router]);
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      setIsDialogOpen(false);
+      toast({ title: "Success", description: result.message });
+      router.push(`/${orgId}/job-management`);
+    } catch (error) {
+      console.error(error);
+      if (error instanceof Error) {
+        toast({
+          title: "Failed to delete job",
+          variant: "destructive",
+          description: error.toString(),
+        });
+      }
+    }
+  };
 
   const onSubmit = async (data: JobFormValues) => {
     if (!form.formState.isValid) {
@@ -66,6 +124,15 @@ export default function EditJobPage({
     });
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-1 justify-center items-center mt-[200px] w-full">
+        <Spinner />
+        <span className="text-center">Loading...</span>
+      </div>
+    );
+  }
+
   return (
     <JobFormPage
       form={form}
@@ -73,8 +140,7 @@ export default function EditJobPage({
       isEditing={true}
       isDialogOpen={isDialogOpen}
       setIsDialogOpen={setIsDialogOpen}
-      //   onCancel={() => router.push("/job-management")}
-      //   onDelete={() => handleDelete(params.id)}
+      onDelete={onDelete}
     />
   );
 }

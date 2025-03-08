@@ -133,18 +133,18 @@ export function TeamMemberTable({
                     <AvatarFallback>{name.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <div className="font-medium">
-                      {name}
-                      {isMe(email) && (
-                        <span className="ml-2 text-sm font-light text-gray-500">
-                          {"(me)"}
-                        </span>
-                      )}
-                    </div>
+                    <div className="font-medium">{name}</div>
                     <div className="text-sm text-gray-500">{email}</div>
                   </div>
                 </TableCell>
-                <TableCell className="capitalize">{member.role}</TableCell>
+                <TableCell className="capitalize">
+                  {member.role}
+                  {isMe(email) && (
+                    <span className="ml-2 text-sm font-light text-gray-500">
+                      {"(You)"}
+                    </span>
+                  )}
+                </TableCell>
                 {isMeOwner() || isMe(email) ? (
                   <TableCell className="flex items-center gap-4">
                     <Button
@@ -157,7 +157,7 @@ export function TeamMemberTable({
                       className="border-transparent text-red-500 hover:text-red-600 bg-transparent hover:bg-transparent"
                       onClick={() => handleRemove(member)}
                     >
-                     { isMe(email) ? "Leave" : "Remove"}
+                      {isMe(email) ? "Leave" : "Remove"}
                     </button>
                   </TableCell>
                 ) : (
@@ -188,23 +188,32 @@ export function TeamMemberTable({
             <AlertDialogTitle className="text-lg font-semibold">
               Are you sure?
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-base">
-              This will remove{" "}
-              <span className="font-medium text-foreground">
-                {memberToRemove?.user.name}
-              </span>{" "}
-              from the team?
-              <p className="mt-1 text-sm font-light italic text-muted-foreground">
-                (This action cannot be undone.)
-              </p>
-            </AlertDialogDescription>
+            {isMe(memberToRemove?.user.email ?? "") ? (
+              <AlertDialogDescription className="text-base">
+                This will remove you from the team
+                <p className="mt-1 text-sm font-light italic text-muted-foreground">
+                  (This action cannot be undone.)
+                </p>
+              </AlertDialogDescription>
+            ) : (
+              <AlertDialogDescription className="text-base">
+                This will remove{" "}
+                <span className="font-medium text-foreground">
+                  {memberToRemove?.user.name}
+                </span>{" "}
+                from the team
+                <p className="mt-1 text-sm font-light italic text-muted-foreground">
+                  (This action cannot be undone.)
+                </p>
+              </AlertDialogDescription>
+            )}
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-4">
             <AlertDialogCancel
               className="w-full sm:w-auto"
               onClick={() => setMemberToRemove(null)}
             >
-              Keep Member
+              {"Cancel"}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmRemove}
@@ -217,7 +226,7 @@ export function TeamMemberTable({
                   Loading
                 </>
               ) : (
-                "Remove Member"
+                "Confirm"
               )}
             </AlertDialogAction>
           </AlertDialogFooter>

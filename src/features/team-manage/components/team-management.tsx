@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { SearchBar } from "./search-bar";
 import { AddMemberModal } from "./add-member-modal";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ import {
   removeMember,
 } from "../api/action";
 
-export function TeamManagement() {
+export function TeamManagement({ orgId }: Readonly<{ orgId: string }>) {
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -26,10 +26,10 @@ export function TeamManagement() {
       member.user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleFetchOrgMembers = async () => {
+  const handleFetchOrgMembers = useCallback(async () => {
     setIsFetchingMembers(true);
     try {
-      const data = await fetchOrgMembers("1"); // Assuming '1' is the orgId
+      const data = await fetchOrgMembers(orgId);
       console.log(data);
       setMembers(data);
     } catch (error) {
@@ -37,15 +37,15 @@ export function TeamManagement() {
     } finally {
       setIsFetchingMembers(false);
     }
-  };
+  }, [orgId]);
 
   useEffect(() => {
     handleFetchOrgMembers();
-  }, []);
+  }, [handleFetchOrgMembers]);
 
   const handleAddMember = async (email: string) => {
     try {
-      const result = await inviteUser("1", { email });
+      const result = await inviteUser(orgId, { email });
 
       if (!result.success) {
         throw new Error(result.error);
@@ -74,7 +74,7 @@ export function TeamManagement() {
     newRole: "owner" | "moderator"
   ) => {
     try {
-      const result = await editUserRole("1", {
+      const result = await editUserRole(orgId, {
         user_id: userId,
         role: newRole,
       });
@@ -103,7 +103,7 @@ export function TeamManagement() {
 
   const handleRemoveMember = async (userId: string) => {
     try {
-      const result = await removeMember("1", { user_id: userId });
+      const result = await removeMember(orgId, { user_id: userId });
 
       if (!result.success) {
         throw new Error(result.error.message);
@@ -114,7 +114,7 @@ export function TeamManagement() {
         title: "Member removed",
         description: "The member has been removed successfully.",
       });
-      await handleFetchOrgMembers();  
+      await handleFetchOrgMembers();
     } catch (error) {
       console.error("Error removing member:", error);
       toast({

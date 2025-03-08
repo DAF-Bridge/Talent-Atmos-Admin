@@ -6,42 +6,35 @@ import { JobFormValues } from "@/lib/types";
 import { useState } from "react";
 import JobFormPage from "@/features/job-manage/components/JobFormPage";
 import { toast } from "@/hooks/use-toast";
+import { createJob } from "@/features/job-manage/api/action";
+import { useRouter } from "@/i18n/routing";
 
-export default function AddJobPage() {
-  // const router = useRouter();
+export default function AddJobPage({
+  params,
+}: Readonly<{ params: { orgId: string } }>) {
+  const router = useRouter();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const form = useForm<JobFormValues>();
-
-  //   useEffect(() => {
-  //     const fetchJob = async () => {
-  //       try {
-  //         setIsLoading(true);
-  //         const response = await fetch(
-  //           formatInternalUrl(`/api/org/1/get-job/${params.id}`)
-  //         );
-
-  //         if (!response.ok) {
-  //           throw new Error("Failed to fetch job");
-  //         }
-
-  //         const job = await response.json();
-
-  //         // Set form values for each field
-  //         Object.keys(job).forEach((key) => {
-  //           form.setValue(key as keyof JobFormValues, job[key]);
-  //         });
-  //       } catch (error) {
-  //         console.error("Failed to fetch job details");
-  //         toast.error("Failed to load job details");
-  //         router.push("/job-management");
-  //       } finally {
-  //         setIsLoading(false);
-  //       }
-  //     };
-
-  //     fetchJob();
-  //   }, [params.id, form, router]);
+  const form = useForm<JobFormValues>({
+    defaultValues: {
+      title: "",
+      scope: "",
+      prerequisite: [],
+      location: "",
+      workplace: "",
+      workType: "",
+      careerStage: "",
+      period: "",
+      description: "",
+      qualifications: "",
+      quantity: 0,
+      salary: 0,
+      province: "",
+      country: "",
+      status: "draft",
+      categories: [],
+    },
+  });
 
   const onSubmit = async (data: JobFormValues) => {
     if (!form.formState.isValid) {
@@ -53,15 +46,28 @@ export default function AddJobPage() {
       return;
     }
 
-    // Close the dialog
-    setIsDialogOpen(false);
+    try {
+      const result = await createJob(params.orgId, data);
 
-    // If all validations pass, proceed with form submission
-    console.log(data);
-    toast({
-      title: "Success",
-      description: "Event saved and published successfully!",
-    });
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+      toast({
+        title: "Success",
+        description: result.message,
+      });
+      router.push(`/${params.orgId}/job-management`);
+      setIsDialogOpen(false);
+    } catch (error: unknown) {
+      console.error(error);
+      if (error instanceof Error) {
+        toast({
+          title: "Failed to create job",
+          variant: "destructive",
+          description: error.toString(),
+        });
+      }
+    }
   };
 
   return (
