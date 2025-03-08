@@ -111,6 +111,7 @@ export type JobFormValues = {
   country: string;
   status: "draft" | "published" | "";
   categories: [{ label: string; value: string }];
+  registerLink: string;
 };
 
 export type AuthContextType = {

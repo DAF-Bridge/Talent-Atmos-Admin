@@ -3,6 +3,7 @@ import { twMerge } from "tailwind-merge";
 import { th, enUS } from "date-fns/locale";
 import { formatDistanceToNow, isSameDay } from "date-fns";
 import { Option } from "@/components/ui/MultiSelect";
+import { provinces } from "@/components/config/Provinces";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -174,3 +175,16 @@ export const fetchCategories = async (value: string): Promise<Option[]> => {
     return [];
   }
 };
+
+export function getProvinceNameByCode(
+  code: string,
+  locale: string
+): string | undefined {
+  const province = provinces.find((province) => province.code === code);
+
+  if (!province) {
+    return undefined;
+  }
+
+  return province[locale as keyof typeof province];
+}

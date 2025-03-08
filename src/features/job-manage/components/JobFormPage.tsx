@@ -483,6 +483,31 @@ export default function JobFormPage({
             </div>
           </div>
 
+          {/* Reg link */}
+          <div>
+            <h1 className="text-base font-medium border-l-4 pl-2 border-orange-500">
+              Registration Link
+            </h1>
+            <div className="mt-2">
+              <Input
+                type="text"
+                id="registerLink"
+                placeholder="Link to registration form or page"
+                className="block w-full rounded-md border border-gray-300 shadow-sm sm:text-sm"
+                {...register("registerLink", {
+                  required: jobErrMsg.regLink.required,
+                  pattern: {
+                    value: jobErrMsg.regLink.pattern.value,
+                    message: jobErrMsg.regLink.pattern.message,
+                  },
+                })}
+              />
+              {errors.registerLink && (
+                <p className="error-msg mt-1">{errors.registerLink.message}</p>
+              )}
+            </div>
+          </div>
+
           <div className="flex flex-col gap-2">
             <h1 className="text-base font-medium border-l-4 pl-2 border-orange-500">
               Quantity and Salary
@@ -636,7 +661,7 @@ export default function JobFormPage({
                       Are you sure?
                     </AlertDialogTitle>
                     <AlertDialogDescription className="text-base">
-                      You will remove this job permanently. 
+                      You will remove this job permanently.
                       <p className="mt-1 text-sm font-light italic text-muted-foreground">
                         (This action cannot be undone.)
                       </p>
@@ -669,9 +694,9 @@ export default function JobFormPage({
               </AlertDialog>
             </div>
             <div className="flex justify-end gap-4 flex-1">
-              <Button variant="outline" className="w-full lg:max-w-[200px]">
+              {/* <Button variant="outline" className="w-full lg:max-w-[200px]">
                 Save as Draft
-              </Button>
+              </Button> */}
 
               <Dialog
                 open={isDialogOpen}
@@ -681,7 +706,7 @@ export default function JobFormPage({
                   type="button"
                   onClick={validateAndOpenDialog}
                   disabled={isSubmitting}
-                  className="w-full lg:max-w-[200px]"
+                  className="w-full max-w-[200px]"
                 >
                   Save
                 </Button>

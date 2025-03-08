@@ -1,7 +1,12 @@
 "use client";
 
 import { Link } from "@/i18n/routing";
-import { cn, formatDateRange, formatRelativeTime } from "@/lib/utils";
+import {
+  cn,
+  formatDateRange,
+  formatRelativeTime,
+  getProvinceNameByCode,
+} from "@/lib/utils";
 import React from "react";
 import { Calendar, MapPin } from "lucide-react";
 import Image from "next/image";
@@ -85,8 +90,10 @@ export default function EventList({
                 </div>
                 <div className="flex items-center gap-1.5 mt-1.5 text-xs text-gray-600">
                   <MapPin className="shrink-0 w-3 h-3" />
-                  <p className="line-clamp-1">
-                    {event.locationName + ", " + event.province}
+                  <p className="line-clamp-2">
+                    {event.locationName +
+                      ", " +
+                      getProvinceNameByCode(event.province, locale)}
                   </p>
                 </div>
               </div>

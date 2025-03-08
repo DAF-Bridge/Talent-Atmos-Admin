@@ -192,28 +192,32 @@ export default function EventDisplay({
             </div>
           </div>
 
-          <div>
-            <h2 className="text-xl font-semibold mb-2">ช่องทางติดต่อสอบถาม</h2>
-            {event.contactChannels.map((item, index) => (
-              <div key={index} className="flex gap-2 text-gray-700">
-                <span className="font-medium">{item.media}:</span>
-                {item.mediaLink.includes("http") ? (
-                  <a
-                    href={item.mediaLink}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="underline hover:text-gray-inactive break-words whitespace-normal"
-                  >
-                    {item.mediaLink}
-                  </a>
-                ) : (
-                  <span className="break-words whitespace-normal">
-                    {item.mediaLink}
-                  </span>
-                )}
-              </div>
-            ))}
-          </div>
+          {event.contactChannels && (
+            <div>
+              <h2 className="text-xl font-semibold mb-2">
+                ช่องทางติดต่อสอบถาม
+              </h2>
+              {event.contactChannels.map((item, index) => (
+                <div key={index} className="flex gap-2 text-gray-700">
+                  <span className="font-medium">{item.media}:</span>
+                  {item.mediaLink.includes("http") ? (
+                    <a
+                      href={item.mediaLink}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="underline hover:text-gray-inactive break-words whitespace-normal"
+                    >
+                      {item.mediaLink}
+                    </a>
+                  ) : (
+                    <span className="break-words whitespace-normal">
+                      {item.mediaLink}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

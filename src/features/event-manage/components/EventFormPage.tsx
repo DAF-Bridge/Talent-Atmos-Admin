@@ -745,9 +745,9 @@ export default function EventFormPage({
               </AlertDialog>
             </div>
             <div className="flex justify-end gap-4 flex-1">
-              <Button variant="outline" className="w-full lg:max-w-[200px]">
+              {/* <Button variant="outline" className="w-full lg:max-w-[200px]">
                 Save as Draft
-              </Button>
+              </Button> */}
 
               <Dialog
                 open={isDialogOpen}
@@ -757,7 +757,7 @@ export default function EventFormPage({
                   type="button"
                   onClick={validateAndOpenDialog}
                   disabled={isSubmitting}
-                  className="w-full lg:max-w-[200px]"
+                  className="w-full max-w-[200px]"
                 >
                   Submit
                 </Button>
