@@ -8,22 +8,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+// import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-  CalendarIcon,
-  UserIcon,
-  BriefcaseIcon,
-} from "lucide-react";
-import {
-  Bar,
-  BarChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { CalendarIcon, UserIcon, BriefcaseIcon } from "lucide-react";
+// import {
+//   Bar,
+//   BarChart,
+//   ResponsiveContainer,
+//   Tooltip,
+//   XAxis,
+//   YAxis,
+// } from "recharts";
 import { useAuth } from "@/context/AuthContext";
+import { getMyOrgs } from "@/features/organization/api/action";
+import { OrganizationCardProps } from "@/lib/types";
 
 const data = [
   {
@@ -52,9 +50,15 @@ const data = [
   },
 ];
 
-export default function DashboardPage() {
+export default function DashboardPage({
+  params,
+}: Readonly<{
+  params: { orgId: string };
+}>) {
   const [greeting, setGreeting] = useState("Good morning");
   const { userProfile } = useAuth();
+  const [org, setOrg] = useState<OrganizationCardProps>();
+  const orgId = params.orgId;
 
   // Update greeting based on time of day
   useEffect(() => {
@@ -65,6 +69,19 @@ export default function DashboardPage() {
       setGreeting("Good evening");
     }
   }, []);
+
+  useEffect(() => {
+    const fetchOrgById = async () => {
+      const orgArr: OrganizationCardProps[] = await getMyOrgs();
+      console.log(orgArr);
+      if (data) {
+        const org = orgArr.find((org) => org.id.toString() === orgId);
+        console.log(org);
+        setOrg(org);
+      }
+    };
+    fetchOrgById();
+  }, [orgId]);
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-6 h-full overflow-y-scroll">
@@ -85,7 +102,7 @@ export default function DashboardPage() {
             <UserIcon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">1,234</div>
+            <div className="text-2xl font-bold">{org?.numberOfMembers}</div>
             {/* <p className="text-xs text-muted-foreground">
               +10% from last month
             </p> */}
@@ -99,7 +116,7 @@ export default function DashboardPage() {
             <BriefcaseIcon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">23</div>
+            <div className="text-2xl font-bold">{org?.numberOfOpenJobs}</div>
             {/* <p className="text-xs text-muted-foreground">+2 new this week</p> */}
           </CardContent>
         </Card>
@@ -109,7 +126,7 @@ export default function DashboardPage() {
             <CalendarIcon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">7</div>
+            <div className="text-2xl font-bold">{org?.numberOfEvents}</div>
             {/* <p className="text-xs text-muted-foreground">
               Next event in 3 days
             </p> */}
@@ -136,7 +153,10 @@ export default function DashboardPage() {
             <CardTitle>Employee Growth</CardTitle>
           </CardHeader>
           <CardContent className="pl-2">
-            <ResponsiveContainer width="100%" height={350}>
+            <div className="flex justify-center items-center my-auto">
+              Under Development
+            </div>
+            {/* <ResponsiveContainer width="100%" height={350}>
               <BarChart data={data}>
                 <XAxis
                   dataKey="name"
@@ -155,16 +175,19 @@ export default function DashboardPage() {
                 <Tooltip />
                 <Bar dataKey="total" fill="#adfa1d" radius={[4, 4, 0, 0]} />
               </BarChart>
-            </ResponsiveContainer>
+            </ResponsiveContainer> */}
           </CardContent>
         </Card>
         <Card className="col-span-3">
           <CardHeader>
             <CardTitle>Recent Activities</CardTitle>
-            <CardDescription>You have 3 new notifications</CardDescription>
+            <CardDescription></CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-8">
+            <div className="flex justify-center items-center my-auto">
+              Under Development
+            </div>
+            {/* <div className="space-y-8">
               <div className="flex items-center">
                 <Avatar className="h-9 w-9">
                   <AvatarImage src="/avatars/01.png" alt="Avatar" />
@@ -214,7 +237,7 @@ export default function DashboardPage() {
                   <div className="ml-auto font-[4px]">Yesterday</div>
                 </div>
               </div>
-            </div>
+            </div> */}
           </CardContent>
         </Card>
       </div>

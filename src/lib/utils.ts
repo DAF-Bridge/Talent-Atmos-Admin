@@ -149,12 +149,37 @@ export function base64ToFile(base64String: string, filename: string): File {
   return new File([u8arr], filename, { type: mime });
 }
 
-export const fetchCategories = async (value: string): Promise<Option[]> => {
+export const fetchCategories = async (
+  value: string,
+  type: "event" | "job"
+): Promise<Option[]> => {
   try {
     const apiUrl = formatExternalUrl("/events/categories/list");
     const response = await fetch(apiUrl);
     const data = await response.json();
-    const categories = data.categories;
+    let categories = data.categories;
+    console.log("before: ", categories);
+
+    // if type is event remove categories value 1, 10-13
+    if (type === "event") {
+      const excludeVal = [1, 10];
+      categories = categories.filter(
+        (category: { label: string; value: number }) =>
+          !excludeVal.includes(category.value)
+      );
+    }
+
+    // if type is job only display categories value 1, 10-13
+    if (type === "job") {
+      const includeVal = [11, 12, 13];
+      categories = categories.filter(
+        (category: { label: string; value: number }) =>
+          includeVal.includes(category.value)
+      );
+    }
+
+    console.log("after: ", categories);
+
     if (value) {
       return categories
         .filter((category: { label: string; value: number }) =>

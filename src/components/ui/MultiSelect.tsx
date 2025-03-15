@@ -476,7 +476,7 @@ const MultipleSelector = React.forwardRef<
                   key={option.value}
                   className={cn(
                     "data-[disabled]:bg-muted-foreground data-[disabled]:text-muted data-[disabled]:hover:bg-muted-foreground",
-                    "data-[fixed]:bg-muted-foreground data-[fixed]:text-muted data-[fixed]:hover:bg-muted-foreground",
+                    "data-[fixed]:bg-muted-foreground data-[fixed]:text-muted data-[fixed]:hover:bg-muted-foreground capitalize",
                     badgeClassName
                   )}
                   data-fixed={option.fixed}
@@ -609,7 +609,7 @@ const MultipleSelector = React.forwardRef<
                                 onChange?.(newOptions);
                               }}
                               className={cn(
-                                "cursor-pointer",
+                                "cursor-pointer capitalize",
                                 option.disable &&
                                   "cursor-default text-muted-foreground"
                               )}

@@ -112,6 +112,8 @@ export default function OrgRegisterPage() {
   };
 
   const validateAndOpenDialog = async () => {
+    // display all form value
+    console.log(form.getValues());
     // Trigger all field validations
     const isFormValid = await form.trigger();
 

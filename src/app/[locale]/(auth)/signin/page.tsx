@@ -9,10 +9,11 @@ import LangSwitcher from "@/components/common/LangSwitcher";
 import { FieldValues, useForm } from "react-hook-form";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import GoogleLoginBtn from "@/features/auth/GoogleLoginBtn";
 import { signIn } from "@/features/auth/api/action";
+import { useSearchParams } from "next/navigation";
 
 export default function SigninPage() {
   const t = useTranslations("HomePage");
@@ -28,14 +29,29 @@ export default function SigninPage() {
       password: "",
     },
   });
+  const searchParams = useSearchParams();
+  const [callbackUrl, setCallbackUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Get the callback URL from the query parameters
+    const callback = searchParams.get("redirect");
+    if (callback) {
+      setCallbackUrl(callback);
+      console.log(callback);
+    }
+  }, [searchParams]);
+
+  const handleRedirect = () => {
+    if (callbackUrl) {
+      window.location.href = "/" + callbackUrl;
+    } else {
+      window.location.href = "/my-organizations";
+    }
+  };
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
-
-  // const handleGoogleLogin = () => {
-  //   window.location.href = formatExternalUrl("/auth/google");
-  // };
 
   const OnSubmit = async (data: FieldValues) => {
     try {
@@ -52,7 +68,7 @@ export default function SigninPage() {
           description: "Signin using email successful",
         });
 
-        window.location.href = "/my-organizations";
+        handleRedirect();
       } else {
         throw new Error(result.error);
       }
@@ -173,7 +189,7 @@ export default function SigninPage() {
               </span>
             </div>
           </div>
-          <GoogleLoginBtn />
+          <GoogleLoginBtn handleRedirect={handleRedirect} />
         </div>
       </div>
     </div>

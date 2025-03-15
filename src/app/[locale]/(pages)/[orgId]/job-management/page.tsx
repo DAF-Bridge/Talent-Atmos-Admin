@@ -46,7 +46,7 @@ export default function JobManagementPage({
       filteredByTab = jobs.filter((e) => e.status === "draft") ?? [];
     }
 
-    console.log("filteredByTab: " + filteredByTab);
+    // console.log("filteredByTab: " + filteredByTab);
 
     // Calculate pagination
     const totalPages = Math.ceil(filteredByTab.length / itemsPerPage);
@@ -83,8 +83,11 @@ export default function JobManagementPage({
           throw new Error(result.error.message);
         }
 
-        const jobs = result.data;
-        console.log(jobs);
+        const jobs: JobProps[] = result.data;
+        // sort jobs by updatedAt
+        jobs.sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt));
+
+        // console.log(jobs);
         setJobs(jobs);
         setFilteredJobs(jobs);
       } catch (error) {

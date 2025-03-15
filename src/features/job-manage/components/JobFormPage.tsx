@@ -247,30 +247,6 @@ export default function JobFormPage({
                 </div>
               </div>
             </div>
-            <div>
-              <Label
-                htmlFor="location"
-                className="sm:text-right required-input mt-2"
-              >
-                Location
-              </Label>
-              <div>
-                <Input
-                  {...register("location", {
-                    required: jobErrMsg.location.required,
-                  })}
-                  id="location"
-                  type="text"
-                  className="input-outline"
-                  placeholder="Enter job location"
-                />
-                {errors.location && (
-                  <span className="error-msg">
-                    {errors.location.message as string}
-                  </span>
-                )}
-              </div>
-            </div>
             <div className="flex gap-4">
               <div className="flex-1">
                 {/* province */}
@@ -385,7 +361,7 @@ export default function JobFormPage({
                 form={form}
                 errMessage={jobErrMsg.categories.required}
                 name="categories"
-                onSearch={fetchCategories}
+                onSearch={(value) => fetchCategories(value, "job")}
               />
               {errors.categories && (
                 <p className="error-msg">{errors.categories.message}</p>

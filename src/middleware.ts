@@ -49,7 +49,24 @@ export async function middleware(req: NextRequest) {
       req.headers.get("Authorization")?.replace("Bearer ", ""); // Get token from Authorization header
 
     if (!token) {
-      return NextResponse.redirect(new URL("/signin", req.url));
+      // Store the original URL to redirect back after authentication
+      const redirectUrl = req.nextUrl.pathname + req.nextUrl.search;
+      const signinUrl = new URL("/signin", req.url);
+
+      // Remove locale prefix if present and strip leading slash
+      const localePattern = new RegExp(
+        `^/(${routing.locales.join("|")})(/.*)$`
+      );
+      const localeMatch = RegExp(localePattern).exec(redirectUrl);
+      let cleanRedirectUrl = localeMatch ? localeMatch[2] : redirectUrl;
+
+      // Remove the leading slash
+      cleanRedirectUrl = cleanRedirectUrl.replace(/^\//, "");
+
+      // Add the redirect URL as a query parameter
+      signinUrl.searchParams.set("redirect", cleanRedirectUrl);
+
+      return NextResponse.redirect(signinUrl);
     }
 
     try {

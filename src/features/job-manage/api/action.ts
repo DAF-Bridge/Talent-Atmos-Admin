@@ -96,3 +96,29 @@ export async function deleteJob(orgId: string, jobId: string) {
     return { success: false, error: data.error, status: res.status };
   }
 }
+
+export async function updateJob(
+  orgId: string,
+  jobId: string,
+  body: JobFormValues
+) {
+  const cookieStore = cookies();
+  const apiUrl = formatExternalUrl(`/orgs/${orgId}/jobs/update/${jobId}`);
+  // console.log(apiUrl);
+  const res = await fetch(apiUrl, {
+    method: "PUT",
+    body: JSON.stringify(body),
+    headers: {
+      "Content-Type": "application/json",
+      Cookie: cookieStore.toString(),
+    },
+  });
+  if (res.ok) {
+    const data = await res.json();
+    return { success: true, message: data.message, status: res.status };
+  } else {
+    const data = await res.json();
+    console.error("API Error:", data);
+    return { success: false, error: data.error, status: res.status };
+  }
+}

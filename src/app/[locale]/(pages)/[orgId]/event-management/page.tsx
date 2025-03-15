@@ -59,7 +59,13 @@ export default function EventManagementPage({
           throw new Error(result.error.message);
         }
 
-        const events = result.data;
+        const events: Event[] = result.data;
+        
+        // sort events by updatedAt
+        events.sort(
+          (a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt)
+        );
+
         console.log(events);
         setEvents(events);
         setFilteredEvents(events);

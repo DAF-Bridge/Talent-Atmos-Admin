@@ -36,7 +36,6 @@ export default function JobDisplay({
   }
   return (
     <div className="h-full overflow-y-auto bg-white min-w-[750px]">
-      {job.id}
       <div className="sticky top-0 z-10 bg-white/70 backdrop-blur flex justify-between items-center px-4 pb-2">
         <p className="text-xl font-medium text-center mt-2 p-2 border-l-4 border-orange-500">
           Job Details

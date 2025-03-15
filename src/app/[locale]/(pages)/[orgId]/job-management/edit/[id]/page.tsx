@@ -5,7 +5,11 @@ import { JobFormValues } from "@/lib/types";
 import { useEffect, useState } from "react";
 import JobFormPage from "@/features/job-manage/components/JobFormPage";
 import { toast } from "@/hooks/use-toast";
-import { deleteJob, getOrgJobById } from "@/features/job-manage/api/action";
+import {
+  deleteJob,
+  getOrgJobById,
+  updateJob,
+} from "@/features/job-manage/api/action";
 import Spinner from "@/components/ui/spinner";
 import { useRouter } from "@/i18n/routing";
 
@@ -26,7 +30,6 @@ export default function EditJobPage({
       title: "",
       scope: "",
       prerequisite: [],
-      location: "",
       workplace: "",
       workType: "",
       registerLink: "",
@@ -43,29 +46,17 @@ export default function EditJobPage({
     },
   });
 
-  // Fetch event data from the server
+  // Fetch job data from the server
   useEffect(() => {
     const fetchJob = async () => {
       setIsLoading(true);
       try {
         const result = await getOrgJobById(orgId, jobId);
-        const event = result.data;
-        console.log(event);
+        const job: JobFormValues = result.data;
+        console.log(job);
 
-        // Transform the data if necessary
-        const formattedJob: JobFormValues = {
-          ...event,
-          startDate: event.startDate
-            ? new Date(event.startDate).toISOString().split("T")[0]
-            : "",
-          endDate: event.endDate
-            ? new Date(event.endDate).toISOString().split("T")[0]
-            : "",
-          // Add any other necessary transformations here
-        };
-
-        setInitialValues(formattedJob);
-        form.reset(formattedJob);
+        setInitialValues(job);
+        form.reset(job);
       } catch (error) {
         console.error("Failed to fetch job:", error);
         toast({
@@ -114,15 +105,28 @@ export default function EditJobPage({
       return;
     }
 
-    // Close the dialog
-    setIsDialogOpen(false);
+    try {
+      const result = await updateJob(orgId, jobId, data);
 
-    // If all validations pass, proceed with form submission
-    console.log(data);
-    toast({
-      title: "Success",
-      description: "Event saved and published successfully!",
-    });
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+      toast({
+        title: "Success",
+        description: result.message,
+      });
+      router.push(`/${params.orgId}/job-management`);
+      setIsDialogOpen(false);
+    } catch (error: unknown) {
+      console.error(error);
+      if (error instanceof Error) {
+        toast({
+          title: "Failed to update job",
+          variant: "destructive",
+          description: error.toString(),
+        });
+      }
+    }
   };
 
   if (isLoading) {

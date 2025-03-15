@@ -58,7 +58,7 @@ export async function getAllEventsByOrgId(orgId: string | null) {
   if (orgId === null) return { success: false, error: "orgId is null" };
 
   const cookieStore = cookies();
-  console.log("cookies: ", JSON.stringify(cookies));
+  // console.log("cookies: ", JSON.stringify(cookies));
   const apiUrl = formatExternalUrl(`/orgs/${orgId}/events`);
   const res = await fetch(apiUrl, {
     method: "GET",

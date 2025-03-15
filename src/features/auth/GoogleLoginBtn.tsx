@@ -5,7 +5,9 @@ import Image from "next/image";
 import React from "react";
 import { googleOauthCallback } from "./api/action";
 
-export default function GoogleLoginBtn() {
+export default function GoogleLoginBtn({
+  handleRedirect,
+}: Readonly<{ handleRedirect: () => void }>) {
   const { setAuthState } = useAuth();
   const login = useGoogleLogin({
     flow: "auth-code",
@@ -18,7 +20,7 @@ export default function GoogleLoginBtn() {
           description: "Signin using oauth successful",
         });
 
-        window.location.href = "/dashboard";
+        handleRedirect();
       } else {
         console.log("Golang Callback Failed");
         toast({

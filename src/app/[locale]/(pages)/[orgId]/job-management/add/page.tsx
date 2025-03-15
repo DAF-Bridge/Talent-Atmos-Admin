@@ -20,7 +20,6 @@ export default function AddJobPage({
       title: "",
       scope: "",
       prerequisite: [],
-      location: "",
       workplace: "",
       workType: "",
       registerLink: "",

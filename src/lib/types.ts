@@ -98,7 +98,6 @@ export type JobFormValues = {
     title: string;
     link: string;
   }[];
-  location: string;
   workplace: "remote" | "onsite" | "hybrid" | "";
   workType: "fulltime" | "parttime" | "volunteer" | "internship" | "";
   careerStage: "entrylevel" | "midlevel" | "senior" | "";

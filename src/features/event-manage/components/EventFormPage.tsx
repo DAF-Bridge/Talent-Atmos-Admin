@@ -344,7 +344,7 @@ export default function EventFormPage({
                   form={form}
                   errMessage={eventErrMsg.categories.required}
                   name="categories"
-                  onSearch={fetchCategories}
+                  onSearch={(value) => fetchCategories(value, "event")}
                 />
                 {errors.categories && (
                   <p className="error-msg">{errors.categories.message}</p>
@@ -774,12 +774,12 @@ export default function EventFormPage({
                           <span className="text-sm">Status:</span>
                           <span
                             className={`text-sm font-medium ${
-                              form.watch("status")
+                              form.watch("status") === "published"
                                 ? "text-green-600"
                                 : "text-red-500"
                             }`}
                           >
-                            {form.watch("status")
+                            {form.watch("status") === "published"
                               ? "Will Be Published"
                               : "Will Not Publish"}
                           </span>
