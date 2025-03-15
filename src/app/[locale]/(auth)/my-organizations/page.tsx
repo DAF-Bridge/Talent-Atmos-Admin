@@ -20,7 +20,12 @@ export default function MyOrganizations() {
       try {
         const data = await getMyOrgs();
         console.log(data);
-        setOrgs(data);
+        if (Array.isArray(data)) {
+          setOrgs(data.filter((org) => org !== null && org !== undefined));
+        } else {
+          setOrgs([]); // Default to an empty array if response is not an array
+        }
+        // setOrgs(data);
       } catch (error) {
         console.error("Error fetching members:", error);
       } finally {
@@ -59,9 +64,13 @@ export default function MyOrganizations() {
         </div>
       ) : (
         <div className="space-y-6">
-          {orgs.map((org) => (
-            <OrganizationCard key={org.id} {...org} />
-          ))}
+          <div className="space-y-6">
+            {orgs
+              .filter((org) => org && org.id)
+              .map((org) => (
+                <OrganizationCard key={org.id} {...org} />
+              ))}
+          </div>
         </div>
       )}
     </div>
