@@ -89,14 +89,16 @@ export default function JobList({
                   <Calendar className="shrink-0 w-4 h-4" />
                   <p>{job.period}</p>
                 </div>
-                <div className="flex items-center gap-1.5 text-xs text-gray-600">
-                  <DollarSign className="shrink-0 w-4 h-4" />
-                  <p>
-                    {job.salary
-                      ? `$${job.salary.toLocaleString()}/year`
-                      : "Not specified"}
-                  </p>
-                </div>
+                {(job.salary > 0 && job.workType !== "volunteer") && (
+                  <div className="flex items-center gap-1.5 text-xs text-gray-600">
+                    <DollarSign className="shrink-0 w-4 h-4" />
+                    <p>
+                      {job.salary
+                        ? `$${job.salary.toLocaleString()}/year`
+                        : "Not specified"}
+                    </p>
+                  </div>
+                )}
                 <div className="flex items-center gap-1.5 text-xs text-gray-600">
                   <Users className="shrink-0 w-4 h-4" />
                   <p>

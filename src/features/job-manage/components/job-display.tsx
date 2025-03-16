@@ -76,14 +76,16 @@ export default function JobDisplay({
               <Calendar className="text-primary shrink-0" />
               <span className="text-sm text-gray-700">{job.period}</span>
             </div>
-            <div className="flex items-center gap-3">
-              <DollarSign className="text-primary shrink-0" />
-              <span className="text-sm text-gray-700">
-                {job.salary
-                  ? `$${job.salary.toLocaleString()}/year`
-                  : "Not specified"}
-              </span>
-            </div>
+            {(job.salary > 0 && job.workType !== "volunteer") && (
+              <div className="flex items-center gap-3">
+                <DollarSign className="text-primary shrink-0" />
+                <span className="text-sm text-gray-700">
+                  {job.salary
+                    ? `$${job.salary.toLocaleString()}/year`
+                    : "Not specified"}
+                </span>
+              </div>
+            )}
             <div className="flex items-center gap-3">
               <Users className="text-primary shrink-0" />
               <span className="text-sm text-gray-700">
@@ -103,7 +105,7 @@ export default function JobDisplay({
               ))}
             </div>
           )}
-          <Link href={""}>
+          <Link href={job.registerLink}>
             <Button className="w-full bg-orange-500 hover:bg-orange-500/80">
               Apply for this position
             </Button>
