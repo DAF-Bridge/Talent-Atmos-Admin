@@ -34,7 +34,7 @@ export default function AdminConsoleLayout({
         setOrg(res.data);
       } else {
         toast({
-          title: "Unauthorized",
+          title: "Forbidden",
           description: res.error,
         });
         window.location.href = "/";
