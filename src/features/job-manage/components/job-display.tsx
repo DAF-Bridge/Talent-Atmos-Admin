@@ -76,7 +76,7 @@ export default function JobDisplay({
               <Calendar className="text-primary shrink-0" />
               <span className="text-sm text-gray-700">{job.period}</span>
             </div>
-            {(job.salary > 0 && job.workType !== "volunteer") && (
+            {job.salary > 0 && job.workType !== "volunteer" && (
               <div className="flex items-center gap-3">
                 <DollarSign className="text-primary shrink-0" />
                 <span className="text-sm text-gray-700">
@@ -105,11 +105,15 @@ export default function JobDisplay({
               ))}
             </div>
           )}
-          <Link href={job.registerLink}>
-            <Button className="w-full bg-orange-500 hover:bg-orange-500/80">
-              Apply for this position
-            </Button>
-          </Link>
+
+          <Button
+            onClick={() => {
+              window.open(job.registerLink, "_blank");
+            }}
+            className="w-full bg-orange-500 hover:bg-orange-500/80"
+          >
+            Apply for this position
+          </Button>
         </div>
 
         {/* Description Sections */}
