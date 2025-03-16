@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { formatExternalUrl } from "@/lib/utils";
 
 export async function signIn(credentials: { email: string; password: string }) {
-  const apiUrl = formatExternalUrl("/login");
+  const apiUrl = formatExternalUrl("/admin/login");
   const res = await fetch(apiUrl, {
     cache: "no-store",
     method: "POST",
@@ -52,7 +52,7 @@ export async function getCurrentUser() {
 }
 
 export async function signOut() {
-  const apiUrl = formatExternalUrl("/logout");
+  const apiUrl = formatExternalUrl("/admin/logout");
   const res = await fetch(apiUrl, {
     method: "POST",
     credentials: "include",
@@ -80,7 +80,7 @@ export async function signOut() {
 
 export async function googleOauthCallback(code: string) {
   // console.log(code)
-  const apiUrl = formatExternalUrl("/auth/google/callback?code=" + code);
+  const apiUrl = formatExternalUrl("/admin/auth/google/callback?code=" + code);
   // console.log(apiUrl);
   const res = await fetch(apiUrl, {
     cache: "no-store",
