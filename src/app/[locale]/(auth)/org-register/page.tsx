@@ -185,6 +185,7 @@ export default function OrgRegisterPage() {
         title: "Success",
         description: result.message,
       });
+      window.location.href = "/my-organizations";
       setIsDialogOpen(false);
     } catch (error: unknown) {
       console.error(error);
