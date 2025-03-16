@@ -6,7 +6,7 @@ import { formatExternalUrl } from "@/lib/utils";
 export async function createOrg(body: FormData) {
   console.log("create org");
   const cookieStore = cookies();
-  const apiUrl = formatExternalUrl("/orgs/create");
+  const apiUrl = formatExternalUrl("/admin/orgs/create");
   console.log(body);
   const res = await fetch(apiUrl, {
     method: "POST",
@@ -28,7 +28,7 @@ export async function createOrg(body: FormData) {
 
 export async function getMyOrgs() {
   const cookieStore = cookies();
-  const apiUrl = formatExternalUrl("/my-orgs");
+  const apiUrl = formatExternalUrl("/admin/my-orgs");
   const res = await fetch(apiUrl, {
     method: "GET",
     headers: {
@@ -48,7 +48,7 @@ export async function getMyOrgs() {
 
 export async function getOrgById(orgId: string) {
   const cookieStore = cookies();
-  const apiUrl = formatExternalUrl(`/orgs/get/${orgId}`);
+  const apiUrl = formatExternalUrl(`/admin/orgs/get/${orgId}`);
   const res = await fetch(apiUrl, {
     method: "GET",
     headers: {

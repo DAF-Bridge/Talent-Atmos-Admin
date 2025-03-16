@@ -6,7 +6,7 @@ import { formatExternalUrl } from "@/lib/utils";
 export async function fetchOrgMembers(orgId: string) {
   const cookieStore = cookies();
   console.log("get org members");
-  const apiUrl = formatExternalUrl(`/roles/orgs/${orgId}/all`);
+  const apiUrl = formatExternalUrl(`/admin/roles/orgs/${orgId}/all`);
 
   const response = await fetch(apiUrl, {
     cache: "no-store",
@@ -34,7 +34,7 @@ export async function editUserRole(
   const cookieStore = cookies();
   console.log(cookieStore.toString());
 
-  const apiUrl = formatExternalUrl(`/roles/orgs/${orgId}`);
+  const apiUrl = formatExternalUrl(`/admin/roles/orgs/${orgId}`);
   console.log(apiUrl);
   console.log(body);
 
@@ -55,7 +55,11 @@ export async function editUserRole(
     const data = await res.json();
     console.log(res.status);
     console.error("API Error:", data);
-    return { success: false, error: data.error ?? data.msg, status: res.status };
+    return {
+      success: false,
+      error: data.error ?? data.msg,
+      status: res.status,
+    };
   }
 }
 
@@ -64,7 +68,7 @@ export async function inviteUser(orgId: string, body: { email: string }) {
   const cookieStore = cookies();
   console.log(cookieStore.toString());
 
-  const apiUrl = formatExternalUrl(`/roles/orgs/${orgId}/invitation`);
+  const apiUrl = formatExternalUrl(`/admin/roles/orgs/${orgId}/invitation`);
   console.log(apiUrl);
 
   const res = await fetch(apiUrl, {
@@ -93,7 +97,7 @@ export async function removeMember(orgId: string, body: { user_id: string }) {
   const cookieStore = cookies();
   console.log(cookieStore.toString());
 
-  const apiUrl = formatExternalUrl(`/roles/orgs/${orgId}`);
+  const apiUrl = formatExternalUrl(`/admin/roles/orgs/${orgId}`);
   console.log(apiUrl);
   console.log(body);
 

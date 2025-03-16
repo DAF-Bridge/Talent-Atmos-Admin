@@ -7,7 +7,7 @@ import { JobFormValues } from "@/lib/types";
 export async function createJob(orgId: string, body: JobFormValues) {
   console.log("create job");
   const cookieStore = cookies();
-  const apiUrl = formatExternalUrl(`/orgs/${orgId}/jobs/create`);
+  const apiUrl = formatExternalUrl(`/admin/orgs/${orgId}/jobs/create`);
   console.log(body);
   const res = await fetch(apiUrl, {
     method: "POST",
@@ -33,7 +33,7 @@ export async function getAllJobsByOrgId(orgId: string | null) {
 
   const cookieStore = cookies();
   // console.log("cookies: ", cookieStore.toString());
-  const apiUrl = formatExternalUrl(`/orgs/${orgId}/jobs/list`);
+  const apiUrl = formatExternalUrl(`/admin/orgs/${orgId}/jobs/list`);
   // console.log(apiUrl);
   const res = await fetch(apiUrl, {
     method: "GET",
@@ -58,7 +58,7 @@ export async function getAllJobsByOrgId(orgId: string | null) {
 
 export async function getOrgJobById(orgId: string, jobId: string) {
   const cookieStore = cookies();
-  const apiUrl = formatExternalUrl(`/orgs/${orgId}/jobs/get/${jobId}`);
+  const apiUrl = formatExternalUrl(`/admin/orgs/${orgId}/jobs/get/${jobId}`);
   const res = await fetch(apiUrl, {
     method: "GET",
     headers: {
@@ -79,7 +79,7 @@ export async function getOrgJobById(orgId: string, jobId: string) {
 
 export async function deleteJob(orgId: string, jobId: string) {
   const cookieStore = cookies();
-  const apiUrl = formatExternalUrl(`orgs/${orgId}/jobs/delete/${jobId}`);
+  const apiUrl = formatExternalUrl(`/admin/orgs/${orgId}/jobs/delete/${jobId}`);
   const res = await fetch(apiUrl, {
     method: "DELETE",
     headers: {
@@ -103,7 +103,7 @@ export async function updateJob(
   body: JobFormValues
 ) {
   const cookieStore = cookies();
-  const apiUrl = formatExternalUrl(`/orgs/${orgId}/jobs/update/${jobId}`);
+  const apiUrl = formatExternalUrl(`/admin/orgs/${orgId}/jobs/update/${jobId}`);
   // console.log(apiUrl);
   const res = await fetch(apiUrl, {
     method: "PUT",

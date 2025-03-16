@@ -6,7 +6,7 @@ import { formatExternalUrl } from "@/lib/utils";
 export async function createEvent(orgId: string, body: FormData) {
   console.log("create event");
   const cookieStore = cookies();
-  const apiUrl = formatExternalUrl(`/orgs/${orgId}/events/create`);
+  const apiUrl = formatExternalUrl(`/admin/orgs/${orgId}/events/create`);
   console.log(body);
   const res = await fetch(apiUrl, {
     method: "POST",
@@ -33,7 +33,7 @@ export async function updateEvent(
 ) {
   console.log("update event");
   const cookieStore = cookies();
-  const apiUrl = formatExternalUrl(`/orgs/${orgId}/events/${eventId}`);
+  const apiUrl = formatExternalUrl(`/admin/orgs/${orgId}/events/${eventId}`);
   console.log(apiUrl);
   console.log(body);
   const res = await fetch(apiUrl, {
@@ -59,7 +59,7 @@ export async function getAllEventsByOrgId(orgId: string | null) {
 
   const cookieStore = cookies();
   // console.log("cookies: ", JSON.stringify(cookies));
-  const apiUrl = formatExternalUrl(`/orgs/${orgId}/events`);
+  const apiUrl = formatExternalUrl(`/admin/orgs/${orgId}/events`);
   const res = await fetch(apiUrl, {
     method: "GET",
     headers: {
@@ -82,7 +82,7 @@ export async function getAllEventsByOrgId(orgId: string | null) {
 
 export async function getOrgEventById(orgId: string, eventId: string) {
   const cookieStore = cookies();
-  const apiUrl = formatExternalUrl(`/orgs/${orgId}/events/${eventId}`);
+  const apiUrl = formatExternalUrl(`/admin/orgs/${orgId}/events/${eventId}`);
   const res = await fetch(apiUrl, {
     method: "GET",
     headers: {
@@ -102,7 +102,7 @@ export async function getOrgEventById(orgId: string, eventId: string) {
 
 export async function deleteEvent(orgId: string, eventId: string) {
   const cookieStore = cookies();
-  const apiUrl = formatExternalUrl(`/orgs/${orgId}/events/${eventId}`);
+  const apiUrl = formatExternalUrl(`/admin/orgs/${orgId}/events/${eventId}`);
   const res = await fetch(apiUrl, {
     method: "DELETE",
     headers: {
