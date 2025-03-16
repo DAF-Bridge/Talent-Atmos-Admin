@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getOrgById } from "@/features/organization/api/action";
 import { Organization } from "@/features/team-manage/lib/types";
+import { toast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
 
 export default function AdminConsoleLayout({
@@ -28,9 +29,17 @@ export default function AdminConsoleLayout({
     const fetchOrgById = async () => {
       setIsLoading(true);
       const res = await getOrgById(orgId);
+
       if (res.success) {
         setOrg(res.data);
+      } else if (!res.success && res.status === 401) {
+        toast({
+          title: "Unauthorized",
+          description: res.error,
+        });
+        window.location.href = "/";
       }
+
       setIsLoading(false);
     };
     fetchOrgById();
