@@ -3,14 +3,12 @@
 import { Button } from "@/components/ui/button";
 import { getMyOrgs } from "@/features/organization/api/action";
 import OrganizationCard from "@/features/organization/components/organization-card";
-import { toast } from "@/hooks/use-toast";
-import { Link, useRouter } from "@/i18n/routing";
+import { Link } from "@/i18n/routing";
 import { OrganizationCardProps } from "@/lib/types";
 import { Loader2, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function MyOrganizations() {
-  const router = useRouter();
   const [orgs, setOrgs] = useState<OrganizationCardProps[]>([]);
   const [isFetchingOrgs, setIsFetchingOrgs] = useState(false);
 
@@ -35,14 +33,6 @@ export default function MyOrganizations() {
     fetchUserOrgs();
   }, []);
 
-  if (!orgs) {
-    toast({
-      title: "You don't have any organization",
-      description: "Please create one",
-    });
-    return router.push("/org-register");
-  }
-
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <div className="flex justify-between items-center">
@@ -65,11 +55,15 @@ export default function MyOrganizations() {
       ) : (
         <div className="space-y-6">
           <div className="space-y-6">
-            {orgs
-              .filter((org) => org && org.id)
-              .map((org) => (
-                <OrganizationCard key={org.id} {...org} />
-              ))}
+            {orgs && orgs.length > 0 ? (
+              orgs
+                .filter((org) => org && org.id)
+                .map((org) => <OrganizationCard key={org.id} {...org} />)
+            ) : (
+              <div className="flex items-center justify-center mt-5">
+                <span className="text-center">No organizations found</span>
+              </div>
+            )}
           </div>
         </div>
       )}
