@@ -61,7 +61,7 @@ export const eventErrMsg = {
   regLink: {
     required: "Registration link is required",
     pattern: {
-      value: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]+)*\/?$/,
+      value: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]+)*(\?.*)?$/,
       message: "Invalid URL format",
     },
   },
@@ -71,7 +71,7 @@ export const eventErrMsg = {
     },
     url: {
       pattern: {
-        value: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]+)*\/?$/,
+        value: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]+)*(\?.*)?$/,
         message: "Invalid URL format",
       },
       required: "Channel URL is required",

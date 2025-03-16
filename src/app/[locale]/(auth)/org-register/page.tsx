@@ -743,7 +743,7 @@ export default function OrgRegisterPage() {
                             required: "Channel URL is required",
                             pattern: {
                               value:
-                                /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]+)*\/?$/,
+                                /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]+)*(\?.*)?$/,
                               message: "Invalid URL format",
                             },
                           }
