@@ -32,7 +32,7 @@ export default function AdminConsoleLayout({
 
       if (res.success) {
         setOrg(res.data);
-      } else if (!res.success && res.status === 401) {
+      } else {
         toast({
           title: "Unauthorized",
           description: res.error,
