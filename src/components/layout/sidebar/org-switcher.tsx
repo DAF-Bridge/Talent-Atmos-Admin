@@ -43,7 +43,11 @@ export default function OrgSwitcher({
                   <div className="w-full h-full bg-gray-200 animate-pulse" />
                 ) : (
                   <Avatar className="rounded-none border-none">
-                    <AvatarImage src={orgPic} alt={orgName} />
+                    <AvatarImage
+                      src={orgPic}
+                      alt={orgName}
+                      className="object-cover"
+                    />
                     <AvatarFallback className="rounded-none border-none">
                       {orgName.slice(0, 2).toUpperCase()}
                     </AvatarFallback>
