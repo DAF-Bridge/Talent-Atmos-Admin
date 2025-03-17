@@ -355,7 +355,7 @@ export default function JobFormPage({
               </div>
             </div>
             <div>
-              <Label>Categories</Label>
+              <Label>ESG Categories</Label>
               <GenericMultipleSelector
                 maxSelected={5}
                 form={form}

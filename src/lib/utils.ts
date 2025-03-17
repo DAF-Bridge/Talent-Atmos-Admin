@@ -171,7 +171,7 @@ export const fetchCategories = async (
 
     // if type is job only display categories value 1, 10-13
     if (type === "job") {
-      const includeVal = [1, 11, 12, 13];
+      const includeVal = [2, 11, 12, 13];
       categories = categories.filter(
         (category: { label: string; value: number }) =>
           includeVal.includes(category.value)
