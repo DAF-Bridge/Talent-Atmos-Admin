@@ -51,7 +51,7 @@ export default function EventList({
       {events.map((event) => (
         <div key={event.id}>
           <Link
-            href={isMobile ? `edit/${event.id}` : `?id=${event.id}`}
+            href={isMobile ? `event-management/edit/${event.id}` : `?id=${event.id}`}
             className={cn(
               "block border rounded-md p-3 hover:bg-slate-50",
               currentId === `${event.id}` && "bg-gray-200 hover:bg-gray-200"

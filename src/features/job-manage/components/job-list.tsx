@@ -52,7 +52,7 @@ export default function JobList({
       {jobs.map((job) => (
         <div key={job.id}>
           <Link
-            href={isMobile ? `edit/${job.id}` : `?id=${job.id}`}
+            href={isMobile ? `job-management/edit/${job.id}` : `?id=${job.id}`}
             className={cn(
               "block border rounded-md p-4 hover:bg-slate-50 transition-colors",
               currentId === `${job.id}` && "bg-gray-200 hover:bg-gray-200"
