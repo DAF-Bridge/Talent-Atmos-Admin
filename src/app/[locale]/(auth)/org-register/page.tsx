@@ -715,12 +715,16 @@ export default function OrgRegisterPage() {
                 </>
               )}
               <div>
-                <Label htmlFor="telephone">Telephone</Label>
+                <Label htmlFor="telephone" className="flex items-center gap-1">
+                  <span>Telephone</span>
+                  <span className="text-xs text-muted-foreground font-light">
+                    {" (Optional)"}
+                  </span>
+                </Label>
                 <Input
                   id="telephone"
                   placeholder="0811234567"
                   {...register("phone", {
-                    required: "Telephone is required",
                     pattern: {
                       value: /^[0-9+\-\s()]*$/,
                       message: "Invalid telephone number",
