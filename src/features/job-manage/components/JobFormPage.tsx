@@ -78,13 +78,6 @@ export default function JobFormPage({
 
   // form input state
   const isRemote = watch("workplace") === "remote";
-  // useEffect(() => {
-  //   if (isRemote) {
-  //     // remove form value
-  //     setValue("province", "");
-  //     setValue("country", "");
-  //   }
-  // }, [isRemote, setValue]);
 
   const isVolunteer = watch("workType") === "volunteer";
   useEffect(() => {
@@ -95,6 +88,12 @@ export default function JobFormPage({
   }, [isVolunteer, setValue]);
 
   const validateAndOpenDialog = async () => {
+    // remove inappropiate form value
+    if (isRemote) {
+      setValue("province", "");
+      setValue("country", "");
+    }
+
     // display all form value
     console.log(form.getValues());
 

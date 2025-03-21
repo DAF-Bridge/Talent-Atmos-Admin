@@ -85,24 +85,21 @@ export default function EventFormPage({
   });
 
   const isRemote = watch("locationType") === "online";
-  // useEffect(() => {
-  //   if (isRemote) {
-  //     // remove form value
-  //     setValue("locationName", "");
-  //     setValue("province", "");
-  //     setValue("country", "");
-  //     setValue("latitude", "");
-  //     setValue("longitude", "");
-  //   } else {
-  //     setValue("locationName", "");
-  //   }
-  // }, [isRemote, setValue]);
 
   useEffect(() => {
     setLogoPreview(form.getValues("picUrl"));
   }, [form]);
 
   const validateAndOpenDialog = async () => {
+    // remove inappropiate form value
+    if (isRemote) {
+      setValue("locationName", "");
+      setValue("province", "");
+      setValue("country", "");
+      setValue("latitude", "");
+      setValue("longitude", "");
+    }
+
     // display all form value
     console.log(form.getValues());
 
