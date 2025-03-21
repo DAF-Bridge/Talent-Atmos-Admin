@@ -93,7 +93,6 @@ export default function EventFormPage({
   const validateAndOpenDialog = async () => {
     // remove inappropiate form value
     if (isRemote) {
-      setValue("locationName", "");
       setValue("province", "");
       setValue("country", "");
       setValue("latitude", "");
