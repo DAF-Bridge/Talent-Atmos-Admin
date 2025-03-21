@@ -40,7 +40,6 @@ import React, { useEffect, useState } from "react";
 import { Controller, useFieldArray, UseFormReturn } from "react-hook-form";
 
 import { EventFormValues } from "@/lib/types";
-import { eventErrMsg } from "@/features/event-manage/config/constants";
 import { alphabeticLength, fetchCategories } from "@/lib/utils";
 import { EventPublishToggle } from "./publish-toggle";
 import GenericMultipleSelector from "@/components/common/MultiSelectWithSearch";
@@ -84,6 +83,20 @@ export default function EventFormPage({
     control,
     name: "contactChannels",
   });
+
+  const isRemote = watch("locationType") === "online";
+  useEffect(() => {
+    if (isRemote) {
+      // remove form value
+      setValue("locationName", "");
+      setValue("province", "");
+      setValue("country", "");
+      setValue("latitude", "");
+      setValue("longitude", "");
+    } else {
+      setValue("locationName", "");
+    }
+  }, [isRemote, setValue]);
 
   useEffect(() => {
     setLogoPreview(form.getValues("picUrl"));
@@ -255,7 +268,7 @@ export default function EventFormPage({
                   </button>
                   <input
                     {...register("picUrl", {
-                      required: isEditing ? false : eventErrMsg.picUrl.required,
+                      required: isEditing ? false : "Event poster is required",
                     })}
                     type="file"
                     className="hidden"
@@ -279,16 +292,18 @@ export default function EventFormPage({
                   <Input
                     type="text"
                     id="name"
+                    placeholder="Enter event name"
                     className="rounded-md border border-gray-300 shadow-sm sm:text-sm"
                     {...register("name", {
-                      required: eventErrMsg.name.required,
+                      required: "Event name is required",
                       minLength: {
-                        value: eventErrMsg.name.minVal,
-                        message: eventErrMsg.name.minLength,
+                        value: 3,
+                        message:
+                          "Event name must be at least 3 characters long",
                       },
                       maxLength: {
-                        value: eventErrMsg.name.maxVal,
-                        message: eventErrMsg.name.maxLength,
+                        value: 100,
+                        message: "Event name cannot exceed 100 characters",
                       },
                     })}
                   />
@@ -302,13 +317,13 @@ export default function EventFormPage({
                   <DatePickerWithRange
                     form={form}
                     className="w-full flex-1 min-w-[350px]"
-                    errMsg={eventErrMsg.startDate.required}
+                    errMsg={"Start date is required"}
                   />
                   <TimeRangePicker
                     form={form}
                     className="w-full flex-1 min-w-[350px]"
-                    errMsgStartTime={eventErrMsg.startTime.required}
-                    errMsgEndTime={eventErrMsg.endTime.required}
+                    errMsgStartTime={"Start time is required"}
+                    errMsgEndTime={"End time is required"}
                   />
                 </div>
               </div>
@@ -317,14 +332,14 @@ export default function EventFormPage({
                 <Controller
                   name="priceType"
                   control={control}
-                  rules={{ required: eventErrMsg.price.required }}
+                  rules={{ required: "Price type is required" }}
                   render={({ field }) => (
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <SelectTrigger className="w-full">
-                        <SelectValue />
+                        <SelectValue placeholder="Choose 'Free' or 'Paid'" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="free">Free</SelectItem>
@@ -342,7 +357,7 @@ export default function EventFormPage({
                 <GenericMultipleSelector
                   maxSelected={5}
                   form={form}
-                  errMessage={eventErrMsg.categories.required}
+                  errMessage={"At least one category is required"}
                   name="categories"
                   onSearch={(value) => fetchCategories(value, "event")}
                 />
@@ -355,14 +370,14 @@ export default function EventFormPage({
                 <Controller
                   name="audience"
                   control={control}
-                  rules={{ required: eventErrMsg.price.required }}
+                  rules={{ required: "Audience level is required" }}
                   render={({ field }) => (
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <SelectTrigger className="w-full">
-                        <SelectValue />
+                        <SelectValue placeholder="Choose 'General' or 'Professional'" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="general">General</SelectItem>
@@ -386,20 +401,16 @@ export default function EventFormPage({
               name="content"
               control={control}
               rules={{
-                required: eventErrMsg.description.required,
+                required: "Event description is required",
                 validate: {
                   minLength: (value) => {
-                    if (
-                      alphabeticLength(value) < eventErrMsg.description.minVal
-                    ) {
-                      return eventErrMsg.description.minLength;
+                    if (alphabeticLength(value) < 10) {
+                      return "Description must be at least 10 characters long";
                     }
                   },
                   maxLength: (value) => {
-                    if (
-                      alphabeticLength(value) > eventErrMsg.description.maxVal
-                    ) {
-                      return eventErrMsg.description.maxLength;
+                    if (alphabeticLength(value) > 5000) {
+                      return "Description cannot exceed 5000 characters";
                     }
                   },
                 },
@@ -427,14 +438,14 @@ export default function EventFormPage({
               <Controller
                 name="locationType"
                 control={control}
-                rules={{ required: eventErrMsg.price.required }}
+                rules={{ required: "Event type is required" }}
                 render={({ field }) => (
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
                     <SelectTrigger className="w-full">
-                      <SelectValue />
+                      <SelectValue placeholder="Choose Online or Onsite" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="online">Online</SelectItem>
@@ -447,137 +458,151 @@ export default function EventFormPage({
                 <p className="error-msg">{errors.priceType.message}</p>
               )}
             </div>
-            <div className="mb-2">
-              <Label htmlFor="locationName">Location Name</Label>
-              <Input
-                type="text"
-                id="locationName"
-                className="block w-full rounded-md border border-gray-300 shadow-sm sm:text-sm"
-                {...register("locationName", {
-                  required: eventErrMsg.location.required,
-                  minLength: {
-                    value: eventErrMsg.location.minVal,
-                    message: eventErrMsg.location.minLength,
-                  },
-                })}
-              />
-              {errors.locationName && (
-                <p className="error-msg">{errors.locationName.message}</p>
-              )}
-            </div>
-            <div className="flex gap-4">
-              <div className="flex-1">
-                {/* province */}
-                <Label htmlFor="province">Province</Label>
-                <Controller
-                  name="province"
-                  control={control}
-                  rules={{ required: eventErrMsg.province.required }}
-                  render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger
-                        className="placeholder:font-light placeholder:text-sm"
-                        id="province"
-                      >
-                        <SelectValue
-                          className="font-light placeholder:font-light [&:not(:placeholder-shown)]:font-normal"
-                          placeholder="สถานที่"
-                        />
-                      </SelectTrigger>
-                      <SelectContent className="h-[300px]">
-                        {provinces.map((province) => (
-                          <SelectItem
-                            className="text-sm"
-                            key={province.code}
-                            value={province.code}
+            {watch("locationType") !== "" && (
+              <div className="mb-2">
+                <Label htmlFor="locationName">
+                  {isRemote ? "Channel Name" : "Location Name"}
+                </Label>
+                <Input
+                  type="text"
+                  id="locationName"
+                  className="block w-full rounded-md border border-gray-300 shadow-sm sm:text-sm"
+                  placeholder={
+                    isRemote
+                      ? "e.g. Discord, MS Team, Zoom, etc."
+                      : "Enter location name"
+                  }
+                  {...register("locationName", {
+                    required: "Location name is required",
+                  })}
+                />
+                {errors.locationName && (
+                  <p className="error-msg">{errors.locationName.message}</p>
+                )}
+              </div>
+            )}
+            {/* hide province country lat long when event is remote or the location type is not filled */}
+            {!isRemote && watch("locationType") !== "" && (
+              <>
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    {/* province */}
+                    <Label htmlFor="province">Province</Label>
+                    <Controller
+                      name="province"
+                      control={control}
+                      rules={{ required: "Province is required" }}
+                      render={({ field }) => (
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <SelectTrigger
+                            className="placeholder:font-light placeholder:text-sm"
+                            id="province"
                           >
-                            {locale === "th" ? province.th : province.en}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                {errors.province && (
-                  <p className="error-msg mt-1">{errors.province.message}</p>
-                )}
-              </div>
-              <div className="flex-1">
-                <Label htmlFor="country">Country</Label>
-                <Controller
-                  name="country"
-                  control={control}
-                  rules={{ required: eventErrMsg.country.required }}
-                  defaultValue={watch("country")}
-                  render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger id="country">
-                        <SelectValue placeholder="Select a country" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="TH">Thailand</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                {errors.country && (
-                  <p className="error-msg mt-1">{errors.country.message}</p>
-                )}
-              </div>
-            </div>
+                            <SelectValue
+                              className="font-light placeholder:font-light [&:not(:placeholder-shown)]:font-normal"
+                              placeholder="สถานที่"
+                            />
+                          </SelectTrigger>
+                          <SelectContent className="h-[300px]">
+                            {provinces.map((province) => (
+                              <SelectItem
+                                className="text-sm"
+                                key={province.code}
+                                value={province.code}
+                              >
+                                {locale === "th" ? province.th : province.en}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                    {errors.province && (
+                      <p className="error-msg mt-1">
+                        {errors.province.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <Label htmlFor="country">Country</Label>
+                    <Controller
+                      name="country"
+                      control={control}
+                      rules={{ required: "Country is required" }}
+                      defaultValue={watch("country")}
+                      render={({ field }) => (
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <SelectTrigger id="country">
+                            <SelectValue placeholder="Select a country" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="TH">Thailand</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                    {errors.country && (
+                      <p className="error-msg mt-1">{errors.country.message}</p>
+                    )}
+                  </div>
+                </div>
 
-            <div className="mt-2">
-              <span className="text-base font-medium">Map Coordinate</span>
-              <span className="text-xs text-muted-foreground font-light">
-                {" (required for map display)"}
-              </span>
-            </div>
-            <div className="grid grid-cols-2 gap-5">
-              <div>
-                <Label
-                  htmlFor="latitude"
-                  className="text-xs text-muted-foreground"
-                >
-                  Latitude
-                </Label>
-                <Input
-                  id="latitude"
-                  {...register("latitude", {
-                    required: eventErrMsg.latitude.required,
-                    pattern: {
-                      value: eventErrMsg.latitude.pattern.value,
-                      message: eventErrMsg.latitude.pattern.message,
-                    },
-                  })}
-                  placeholder="13.7563..."
-                />
-                {errors.latitude && (
-                  <p className="error-msg mt-1">{errors.latitude.message}</p>
-                )}
-              </div>
-              <div>
-                <Label
-                  htmlFor="longitude"
-                  className="text-xs text-muted-foreground"
-                >
-                  Longitude
-                </Label>
-                <Input
-                  id="longitude"
-                  {...register("longitude", {
-                    required: eventErrMsg.longitude.required,
-                    pattern: {
-                      value: eventErrMsg.longitude.pattern.value,
-                      message: eventErrMsg.longitude.pattern.message,
-                    },
-                  })}
-                  placeholder="100.3456..."
-                />
-                {errors.longitude && (
-                  <p className="error-msg mt-1">{errors.longitude.message}</p>
-                )}
-              </div>
-            </div>
+                <div className="mt-2">
+                  <span className="text-base font-medium">Map Coordinate</span>
+                  <span className="text-xs text-muted-foreground font-light">
+                    {" (required for map display)"}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-5">
+                  <div>
+                    <Label
+                      htmlFor="latitude"
+                      className="text-xs text-muted-foreground"
+                    >
+                      Latitude
+                    </Label>
+                    <Input
+                      id="latitude"
+                      {...register("latitude", {
+                        required: "Latitude is required",
+                      })}
+                      placeholder="13.7563..."
+                    />
+                    {errors.latitude && (
+                      <p className="error-msg mt-1">
+                        {errors.latitude.message}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <Label
+                      htmlFor="longitude"
+                      className="text-xs text-muted-foreground"
+                    >
+                      Longitude
+                    </Label>
+                    <Input
+                      id="longitude"
+                      {...register("longitude", {
+                        required: "Longitude is required",
+                      })}
+                      placeholder="100.3456..."
+                    />
+                    {errors.longitude && (
+                      <p className="error-msg mt-1">
+                        {errors.longitude.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
           {/* Reg link */}
           <div>
@@ -591,10 +616,11 @@ export default function EventFormPage({
                 placeholder="Link to registration form or page"
                 className="block w-full rounded-md border border-gray-300 shadow-sm sm:text-sm"
                 {...register("registerLink", {
-                  required: eventErrMsg.regLink.required,
+                  required: "Registration link is required",
                   pattern: {
-                    value: eventErrMsg.regLink.pattern.value,
-                    message: eventErrMsg.regLink.pattern.message,
+                    value:
+                      /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/,
+                    message: "Invalid URL format",
                   },
                 })}
               />
@@ -633,7 +659,7 @@ export default function EventFormPage({
                       name={`contactChannels.${index}.media`}
                       control={control}
                       rules={{
-                        required: eventErrMsg.contactChannels.type.required,
+                        required: "Channel type is required",
                       }}
                       render={({ field: { onChange, value } }) => (
                         <Select onValueChange={onChange} value={value}>
@@ -664,11 +690,12 @@ export default function EventFormPage({
                       id={`contactChannels.${index}.mediaLink`}
                       placeholder="https://"
                       {...register(`contactChannels.${index}.mediaLink`, {
-                        required: eventErrMsg.contactChannels.url.required,
+                        required: "Channel URL is required",
                         pattern: {
-                          value: eventErrMsg.contactChannels.url.pattern.value,
+                          value:
+                            /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/,
                           message:
-                            eventErrMsg.contactChannels.url.pattern.message,
+                            "Invalid URL format (e.g. https://www.example.com)",
                         },
                       })}
                     />

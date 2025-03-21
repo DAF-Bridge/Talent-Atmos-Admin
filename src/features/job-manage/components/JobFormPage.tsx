@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Controller, useFieldArray, UseFormReturn } from "react-hook-form";
 import { JobFormValues } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -35,7 +35,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
-import { jobErrMsg } from "../config/constant";
 import { Textarea } from "@/components/ui/textarea";
 import { provinces } from "@/components/config/Provinces";
 import { useLocale } from "next-intl";
@@ -68,6 +67,7 @@ export default function JobFormPage({
     handleSubmit,
     control,
     watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = form;
 
@@ -75,6 +75,24 @@ export default function JobFormPage({
     control,
     name: "prerequisite",
   });
+
+  // form input state
+  const isRemote = watch("workplace") === "remote";
+  useEffect(() => {
+    if (isRemote) {
+      // remove form value
+      setValue("province", "");
+      setValue("country", "");
+    }
+  }, [isRemote, setValue]);
+
+  const isVolunteer = watch("workType") === "volunteer";
+  useEffect(() => {
+    if (isVolunteer) {
+      // remove form value
+      setValue("salary", 0);
+    }
+  }, [isVolunteer, setValue]);
 
   const validateAndOpenDialog = async () => {
     // display all form value
@@ -130,14 +148,6 @@ export default function JobFormPage({
             console.log("errors", errors)
           )}
         >
-          {/* <input
-            type="hidden"
-            id="orgId"
-            {...register("id", {
-              required: false,
-              setValueAs: (value) => (value === "" ? undefined : Number(value)),
-            })}
-          /> */}
           <div className="flex flex-col gap-2 mt-4">
             <Label
               htmlFor="title"
@@ -147,7 +157,7 @@ export default function JobFormPage({
             </Label>
             <div>
               <Input
-                {...register("title", { required: jobErrMsg.title.required })}
+                {...register("title", { required: "Job title is required" })}
                 id="title"
                 className="input-outline"
                 placeholder="Enter job title"
@@ -175,7 +185,7 @@ export default function JobFormPage({
                   <Controller
                     control={form.control}
                     name="workplace"
-                    rules={{ required: jobErrMsg.workplace.required }}
+                    rules={{ required: "Workplace is required" }}
                     render={({ field }) => (
                       <Select
                         onValueChange={field.onChange}
@@ -216,7 +226,7 @@ export default function JobFormPage({
                   <Controller
                     control={form.control}
                     name="workType"
-                    rules={{ required: jobErrMsg.workType.required }}
+                    rules={{ required: "Work type is required" }}
                     render={({ field }) => (
                       <Select
                         onValueChange={field.onChange}
@@ -247,66 +257,74 @@ export default function JobFormPage({
                 </div>
               </div>
             </div>
-            <div className="flex gap-4">
-              <div className="flex-1">
-                {/* province */}
-                <Label htmlFor="province">Province</Label>
-                <Controller
-                  name="province"
-                  control={control}
-                  rules={{ required: jobErrMsg.province.required }}
-                  render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger
-                        className="placeholder:font-light placeholder:text-sm"
-                        id="province"
+            {!isRemote && watch("workplace") !== "" && (
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  {/* province */}
+                  <Label htmlFor="province">Province</Label>
+                  <Controller
+                    name="province"
+                    control={control}
+                    rules={{ required: "Province is required" }}
+                    render={({ field }) => (
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
                       >
-                        <SelectValue
-                          className="font-light placeholder:font-light [&:not(:placeholder-shown)]:font-normal"
-                          placeholder="สถานที่"
-                        />
-                      </SelectTrigger>
-                      <SelectContent className="h-[300px]">
-                        {provinces.map((province) => (
-                          <SelectItem
-                            className="text-sm"
-                            key={province.code}
-                            value={province.code}
-                          >
-                            {locale === "th" ? province.th : province.en}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                        <SelectTrigger
+                          className="placeholder:font-light placeholder:text-sm"
+                          id="province"
+                        >
+                          <SelectValue
+                            className="font-light placeholder:font-light [&:not(:placeholder-shown)]:font-normal"
+                            placeholder="สถานที่"
+                          />
+                        </SelectTrigger>
+                        <SelectContent className="h-[300px]">
+                          {provinces.map((province) => (
+                            <SelectItem
+                              className="text-sm"
+                              key={province.code}
+                              value={province.code}
+                            >
+                              {locale === "th" ? province.th : province.en}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.province && (
+                    <p className="error-msg mt-1">{errors.province.message}</p>
                   )}
-                />
-                {errors.province && (
-                  <p className="error-msg mt-1">{errors.province.message}</p>
-                )}
-              </div>
-              <div className="flex-1">
-                <Label htmlFor="country">Country</Label>
-                <Controller
-                  name="country"
-                  control={control}
-                  rules={{ required: jobErrMsg.country.required }}
-                  defaultValue={watch("country")}
-                  render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger id="country">
-                        <SelectValue placeholder="Select a country" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="TH">Thailand</SelectItem>
-                      </SelectContent>
-                    </Select>
+                </div>
+                <div className="flex-1">
+                  <Label htmlFor="country">Country</Label>
+                  <Controller
+                    name="country"
+                    control={control}
+                    rules={{ required: "Country is required" }}
+                    defaultValue={watch("country")}
+                    render={({ field }) => (
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <SelectTrigger id="country">
+                          <SelectValue placeholder="Select a country" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="TH">Thailand</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.country && (
+                    <p className="error-msg mt-1">{errors.country.message}</p>
                   )}
-                />
-                {errors.country && (
-                  <p className="error-msg mt-1">{errors.country.message}</p>
-                )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
           <div className="flex flex-col gap-2">
             <h1 className="text-base font-medium border-l-4 pl-2 border-orange-500">
@@ -324,14 +342,14 @@ export default function JobFormPage({
                 <Controller
                   control={form.control}
                   name="careerStage"
-                  rules={{ required: jobErrMsg.careerStage.required }}
+                  rules={{ required: "Career stage is required" }}
                   render={({ field }) => (
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <SelectTrigger className="input-outline">
-                        <SelectValue placeholder="Select career stage" />
+                        <SelectValue placeholder="Choose level of experience" />
                       </SelectTrigger>
                       <SelectContent>
                         {CareerStageEnum.map((careerStage) => (
@@ -359,7 +377,7 @@ export default function JobFormPage({
               <GenericMultipleSelector
                 maxSelected={5}
                 form={form}
-                errMessage={jobErrMsg.categories.required}
+                errMessage={"This field is required"}
                 name="categories"
                 onSearch={(value) => fetchCategories(value, "job")}
               />
@@ -376,7 +394,7 @@ export default function JobFormPage({
               </Label>
               <Textarea
                 {...register("description", {
-                  required: jobErrMsg.description.required,
+                  required: "Description is required",
                 })}
                 id="description"
                 className="input-outline"
@@ -398,7 +416,7 @@ export default function JobFormPage({
               </Label>
               <Textarea
                 {...register("scope", {
-                  required: jobErrMsg.responsibilities.required,
+                  required: "Responsibilities is required",
                 })}
                 id="responsibilities"
                 className="input-outline"
@@ -420,7 +438,7 @@ export default function JobFormPage({
               </Label>
               <Textarea
                 {...register("qualifications", {
-                  required: jobErrMsg.qualifications.required,
+                  required: "Qualifications is required",
                 })}
                 id="qualifications"
                 className="input-outline"
@@ -443,7 +461,7 @@ export default function JobFormPage({
               <div>
                 <Input
                   {...register("period", {
-                    required: jobErrMsg.period.required,
+                    required: "Period is required",
                   })}
                   id="period"
                   type="text"
@@ -471,10 +489,11 @@ export default function JobFormPage({
                 placeholder="Link to registration form or page"
                 className="block w-full rounded-md border border-gray-300 shadow-sm sm:text-sm"
                 {...register("registerLink", {
-                  required: jobErrMsg.regLink.required,
+                  required: "Registration link is required",
                   pattern: {
-                    value: jobErrMsg.regLink.pattern.value,
-                    message: jobErrMsg.regLink.pattern.message,
+                    value:
+                      /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/,
+                    message: "Invalid URL format",
                   },
                 })}
               />
@@ -486,7 +505,7 @@ export default function JobFormPage({
 
           <div className="flex flex-col gap-2">
             <h1 className="text-base font-medium border-l-4 pl-2 border-orange-500">
-              Quantity and Salary
+              {isVolunteer ? "Quantity" : "Quantity and Salary"}
             </h1>
             <div className="flex gap-4">
               <div className="flex-1">
@@ -499,7 +518,8 @@ export default function JobFormPage({
                 <div>
                   <Input
                     {...register("quantity", {
-                      required: jobErrMsg.quantity.required,
+                      required: "Quantity is required",
+                      validate: (value) => value > 0,
                       setValueAs: (value) => Number(value) || 0,
                     })}
                     id="quantity"
@@ -515,32 +535,38 @@ export default function JobFormPage({
                   )}
                 </div>
               </div>
-              <div className="flex-1">
-                <Label
-                  htmlFor="salary"
-                  className="sm:text-right required-input mt-2"
-                >
-                  Salary
-                </Label>
-                <div>
-                  <Input
-                    {...register("salary", {
-                      required: jobErrMsg.salary.required,
-                      setValueAs: (value) => Number(value) || 0,
-                    })}
-                    id="salary"
-                    type="number"
-                    className="input-outline"
-                    placeholder="Enter job salary"
-                    min={1}
-                  />
-                  {errors.salary && (
-                    <span className="error-msg">
-                      {errors.salary.message as string}
+              {!isVolunteer && (
+                <div className="flex-1">
+                  <Label
+                    htmlFor="salary"
+                    className="sm:text-right required-input mt-2"
+                  >
+                    <span>Salary</span>
+                    <span className="text-xs text-muted-foreground font-light">
+                      {" (Optional)"}
                     </span>
-                  )}
+                  </Label>
+
+                  <div>
+                    <Input
+                      {...register("salary", {
+                        validate: (value) => value > 0,
+                        setValueAs: (value) => Number(value) || 0,
+                      })}
+                      id="salary"
+                      type="number"
+                      className="input-outline"
+                      placeholder="Enter job salary"
+                      min={0}
+                    />
+                    {errors.salary && (
+                      <span className="error-msg">
+                        {errors.salary.message as string}
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
 
@@ -792,14 +818,14 @@ const WorkTypeEnum = [
 const CareerStageEnum = [
   {
     value: "entrylevel",
-    label: "Entry-level",
+    label: "Entry-level (~1 year)",
   },
   {
     value: "midlevel",
-    label: "Mid-level",
+    label: "Mid-level (2-4 years)",
   },
   {
     value: "senior",
-    label: "Senior",
+    label: "Senior (>5 years)",
   },
 ];

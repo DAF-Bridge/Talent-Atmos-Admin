@@ -37,6 +37,7 @@ import { provinces } from "@/components/config/Provinces";
 import { useLocale } from "next-intl";
 import { createOrg } from "@/features/organization/api/action";
 import ImageDialog from "@/components/common/ImageDialog";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function OrgRegisterPage() {
   const locale = useLocale();
@@ -51,7 +52,7 @@ export default function OrgRegisterPage() {
       description: "",
       address: "",
       province: "",
-      country: "TH",
+      country: "",
       latitude: "",
       longitude: "",
       phone: "",
@@ -72,6 +73,7 @@ export default function OrgRegisterPage() {
   } = form;
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isOrgRemote, setIsOrgRemote] = useState(false);
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -82,6 +84,16 @@ export default function OrgRegisterPage() {
   const [backgroundPreview, setBackgroundPreview] = useState<string | null>(
     null
   );
+
+  const handleIsRemoteClick = () => {
+    setIsOrgRemote(!isOrgRemote);
+    // remove form value
+    setValue("address", "");
+    setValue("province", "");
+    setValue("country", "");
+    setValue("latitude", "");
+    setValue("longitude", "");
+  };
 
   const fetchIndustries = async (value: string): Promise<Option[]> => {
     try {
@@ -391,290 +403,334 @@ export default function OrgRegisterPage() {
                 </div>
               )}
             </div>
-
-            <div>
-              <Label htmlFor="email">
-                <span>Organization Email</span>
-                <span className="text-xs text-muted-foreground font-light">
-                  {" (Use dedicated email)"}
-                </span>
-              </Label>
-              <Input
-                id="email"
-                placeholder="Enter your organization email"
-                {...register("email", {
-                  required: "Email is required",
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: "Invalid email address",
-                  },
-                  maxLength: {
-                    value: 100,
-                    message: "Email must be less than 100 characters",
-                  },
-                })}
-              />
-              {errors.email && (
-                <p className="error-msg mt-1">{errors.email.message}</p>
-              )}
-            </div>
-
-            <div className="relative">
-              <Label htmlFor="name">Organization Name</Label>
-              <Input
-                id="name"
-                placeholder="Enter your organization name"
-                {...register("name", {
-                  required: "Organization name is required",
-                  maxLength: {
-                    value: 150,
-                    message: "Name must be less than 150 characters",
-                  },
-                })}
-              />
-              {errors.name && (
-                <p className="error-msg mt-1">{errors.name.message}</p>
-              )}
-              <div className="absolute right-0 text-[10px] text-muted-foreground mt-1">
-                {watch("name").length}/150
-              </div>
-            </div>
-
-            <div className="relative">
-              <Label htmlFor="headline">
-                <span>Headline</span>
-                <span className="text-xs text-muted-foreground font-light">
-                  {" (short description about your organization)"}
-                </span>
-              </Label>
-              <Input
-                id="headline"
-                placeholder="eg. Startup Incubation Platform, etc."
-                {...register("headline", {
-                  required: "Headline is required",
-                  maxLength: {
-                    value: 200,
-                    message: "Headline must be less than 200 characters",
-                  },
-                })}
-              />
-              {errors.headline && (
-                <p className="error-msg mt-1">{errors.headline.message}</p>
-              )}
-              <div className="absolute right-0 text-[10px] text-muted-foreground mt-1">
-                {watch("headline").length}/200
-              </div>
-            </div>
-
-            <div className="relative">
-              <Label htmlFor="specialty">
-                <span>Specialty</span>
-                <span className="text-xs text-muted-foreground font-light">
-                  {" (what do your organization specialize in?)"}
-                </span>
-              </Label>
-              <Input
-                id="specialty"
-                placeholder="eg. Elderly Care, Social Work, etc."
-                {...register("specialty", {
-                  required: "Specialty is required",
-                  maxLength: {
-                    value: 250,
-                    message: "Specialty must be less than 250 characters",
-                  },
-                })}
-              />
-              {errors.specialty && (
-                <p className="error-msg mt-1">{errors.specialty.message}</p>
-              )}
-              <div className="absolute right-0 text-[10px] text-muted-foreground mt-1">
-                {watch("specialty").length}/250
-              </div>
-            </div>
-
-            <div>
-              <Label>
-                <span>Industries</span>
-                <span className="text-xs text-muted-foreground font-light">
-                  {" (Up to 5)"}
-                </span>
-              </Label>
-              <GenericMultipleSelector
-                maxSelected={5}
-                form={form}
-                errMessage={"Industries is required"}
-                name="industries"
-                onSearch={fetchIndustries}
-              />
-              {errors.industries && (
-                <p className="error-msg">{errors.industries.message}</p>
-              )}
-            </div>
-
-            <div className="relative">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                placeholder="Enter your organization description"
-                {...register("description", {
-                  required: "Description is required",
-                  maxLength: {
-                    value: 5000,
-                    message: "Description must be less than 5000 characters",
-                  },
-                })}
-              />
-              {errors.description && (
-                <p className="error-msg mt-1">{errors.description.message}</p>
-              )}
-              <div className="absolute right-0 text-[10px] text-muted-foreground mt-1">
-                {watch("description").length}/5000
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="address">Address</Label>
-              <Textarea
-                id="address"
-                placeholder="Enter your organization address"
-                {...register("address", {
-                  required: "Address is required",
-                  maxLength: {
-                    value: 500,
-                    message: "Address must be less than 500 characters",
-                  },
-                })}
-              />
-              {errors.address && (
-                <p className="error-msg mt-1">{errors.address.message}</p>
-              )}
-            </div>
-
-            <div className="grid grid-cols-2 gap-5">
+            <div className="space-y-4">
+              <h1 className="text-base font-medium border-l-4 pl-2 border-orange-500">
+                Main Details
+              </h1>
               <div>
-                <Label htmlFor="province">Province</Label>
-                <Controller
-                  name="province"
-                  control={control}
-                  rules={{ required: "Province is required" }}
-                  render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger id="province">
-                        <SelectValue placeholder="Select a province" />
-                      </SelectTrigger>
-                      <SelectContent className="h-[300px]">
-                        {provinces.map((province) => (
-                          <SelectItem
-                            className="text-sm"
-                            key={province.code}
-                            value={province.code}
+                <Label htmlFor="email">
+                  <span>Organization Email</span>
+                  <span className="text-xs text-muted-foreground font-light">
+                    {" (Use dedicated email)"}
+                  </span>
+                </Label>
+                <Input
+                  id="email"
+                  placeholder="Enter your organization email"
+                  {...register("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: "Invalid email address",
+                    },
+                    maxLength: {
+                      value: 100,
+                      message: "Email must be less than 100 characters",
+                    },
+                  })}
+                />
+                {errors.email && (
+                  <p className="error-msg mt-1">{errors.email.message}</p>
+                )}
+              </div>
+
+              <div className="relative">
+                <Label htmlFor="name">Organization Name</Label>
+                <Input
+                  id="name"
+                  placeholder="Enter your organization name"
+                  {...register("name", {
+                    required: "Organization name is required",
+                    maxLength: {
+                      value: 150,
+                      message: "Name must be less than 150 characters",
+                    },
+                  })}
+                />
+                {errors.name && (
+                  <p className="error-msg mt-1">{errors.name.message}</p>
+                )}
+                <div className="absolute right-0 text-[10px] text-muted-foreground mt-1">
+                  {watch("name").length}/150
+                </div>
+              </div>
+
+              <div className="relative">
+                <Label htmlFor="headline">
+                  <span>Headline</span>
+                  <span className="text-xs text-muted-foreground font-light">
+                    {" (short description about your organization)"}
+                  </span>
+                </Label>
+                <Input
+                  id="headline"
+                  placeholder="eg. Startup Incubation Platform, etc."
+                  {...register("headline", {
+                    required: "Headline is required",
+                    maxLength: {
+                      value: 200,
+                      message: "Headline must be less than 200 characters",
+                    },
+                  })}
+                />
+                {errors.headline && (
+                  <p className="error-msg mt-1">{errors.headline.message}</p>
+                )}
+                <div className="absolute right-0 text-[10px] text-muted-foreground mt-1">
+                  {watch("headline").length}/200
+                </div>
+              </div>
+
+              <div className="relative">
+                <Label htmlFor="specialty">
+                  <span>Specialty</span>
+                  <span className="text-xs text-muted-foreground font-light">
+                    {" (what do your organization specialize in?)"}
+                  </span>
+                </Label>
+                <Input
+                  id="specialty"
+                  placeholder="eg. Elderly Care, Social Work, etc."
+                  {...register("specialty", {
+                    required: "Specialty is required",
+                    maxLength: {
+                      value: 250,
+                      message: "Specialty must be less than 250 characters",
+                    },
+                  })}
+                />
+                {errors.specialty && (
+                  <p className="error-msg mt-1">{errors.specialty.message}</p>
+                )}
+                <div className="absolute right-0 text-[10px] text-muted-foreground mt-1">
+                  {watch("specialty").length}/250
+                </div>
+              </div>
+
+              <div>
+                <Label>
+                  <span>Industries</span>
+                  <span className="text-xs text-muted-foreground font-light">
+                    {" (Up to 5)"}
+                  </span>
+                </Label>
+                <GenericMultipleSelector
+                  maxSelected={5}
+                  form={form}
+                  errMessage={"Industries is required"}
+                  name="industries"
+                  onSearch={fetchIndustries}
+                />
+                {errors.industries && (
+                  <p className="error-msg">{errors.industries.message}</p>
+                )}
+              </div>
+
+              <div className="relative">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  placeholder="Enter your organization description"
+                  {...register("description", {
+                    required: "Description is required",
+                    maxLength: {
+                      value: 5000,
+                      message: "Description must be less than 5000 characters",
+                    },
+                  })}
+                />
+                {errors.description && (
+                  <p className="error-msg mt-1">{errors.description.message}</p>
+                )}
+                <div className="absolute right-0 text-[10px] text-muted-foreground mt-1">
+                  {watch("description").length}/5000
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h1 className="text-base font-medium border-l-4 pl-2 border-orange-500">
+                Location
+              </h1>
+              <div
+                className="flex items-center gap-3 w-fit p-3 bg-white rounded-lg border border-gray-200 
+                 hover:bg-gray-50 transition-colors duration-200 cursor-pointer shadow-sm"
+              >
+                <Checkbox
+                  id="isRemote"
+                  checked={isOrgRemote}
+                  onCheckedChange={handleIsRemoteClick}
+                  className="data-[state=checked]:bg-black data-[state=checked]:border-black"
+                />
+
+                <Label
+                  htmlFor="isRemote"
+                  className="text-sm font-medium text-gray-900 cursor-pointer select-none"
+                >
+                  {"Is your organization located online(Remote)?"}
+                </Label>
+              </div>
+              {!isOrgRemote && (
+                <>
+                  <div>
+                    <Label htmlFor="address">Address</Label>
+                    <Textarea
+                      id="address"
+                      placeholder="Enter your organization address"
+                      {...register("address", {
+                        required: "Address is required",
+                        maxLength: {
+                          value: 500,
+                          message: "Address must be less than 500 characters",
+                        },
+                      })}
+                    />
+                    {errors.address && (
+                      <p className="error-msg mt-1">{errors.address.message}</p>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-5">
+                    <div>
+                      <Label htmlFor="province">Province</Label>
+                      <Controller
+                        name="province"
+                        control={control}
+                        rules={{ required: "Province is required" }}
+                        render={({ field }) => (
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value}
                           >
-                            {locale === "th" ? province.th : province.en}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                {errors.province && (
-                  <p className="error-msg mt-1">{errors.province.message}</p>
-                )}
-              </div>
+                            <SelectTrigger id="province">
+                              <SelectValue placeholder="Select a province" />
+                            </SelectTrigger>
+                            <SelectContent className="h-[300px]">
+                              {provinces.map((province) => (
+                                <SelectItem
+                                  className="text-sm"
+                                  key={province.code}
+                                  value={province.code}
+                                >
+                                  {locale === "th" ? province.th : province.en}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                      {errors.province && (
+                        <p className="error-msg mt-1">
+                          {errors.province.message}
+                        </p>
+                      )}
+                    </div>
 
-              <div>
-                <Label htmlFor="country">Country</Label>
-                <Controller
-                  name="country"
-                  control={control}
-                  rules={{ required: "Country is required" }}
-                  render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger id="country">
-                        <SelectValue placeholder="Select a country" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="TH">Thailand</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                {errors.country && (
-                  <p className="error-msg mt-1">{errors.country.message}</p>
-                )}
-              </div>
-            </div>
+                    <div>
+                      <Label htmlFor="country">Country</Label>
+                      <Controller
+                        name="country"
+                        control={control}
+                        rules={{ required: "Country is required" }}
+                        render={({ field }) => (
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value}
+                          >
+                            <SelectTrigger id="country">
+                              <SelectValue placeholder="Select a country" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="TH">Thailand</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                      {errors.country && (
+                        <p className="error-msg mt-1">
+                          {errors.country.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
 
-            <div className="mt-2">
-              <p className="text-base font-medium">
-                <span>Map Coordinate</span>
-                <span className="text-xs text-muted-foreground font-light">
-                  {" (Required for map marker)"}
-                </span>
-              </p>
-              <div className="grid grid-cols-2 gap-5">
-                <div>
-                  <Label
-                    htmlFor="latitude"
-                    className="text-xs text-muted-foreground"
-                  >
-                    Latitude
-                  </Label>
-                  <Input
-                    id="latitude"
-                    placeholder="eg. 13.7563..."
-                    {...register("latitude", {
-                      required: "Latitude is required",
-                      pattern: {
-                        value: /^-?([0-8]?\d|90)(\.\d+)?$/,
-                        message: "Invalid latitude",
-                      },
-                    })}
-                  />
-                  {errors.latitude && (
-                    <p className="error-msg mt-1">{errors.latitude.message}</p>
-                  )}
-                </div>
-                <div>
-                  <Label
-                    htmlFor="longitude"
-                    className="text-xs text-muted-foreground"
-                  >
-                    Longitude
-                  </Label>
-                  <Input
-                    id="longitude"
-                    placeholder="eg. 100.565..."
-                    {...register("longitude", {
-                      required: "Longitude is required",
-                      pattern: {
-                        value: /^-?(\d{1,2}|1[0-7]\d|180)(\.\d+)?$/,
-                        message: "Invalid longitude",
-                      },
-                    })}
-                  />
-                  {errors.longitude && (
-                    <p className="error-msg mt-1">{errors.longitude.message}</p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="telephone">Telephone</Label>
-              <Input
-                id="telephone"
-                placeholder="0811234567"
-                {...register("phone", {
-                  required: "Telephone is required",
-                  pattern: {
-                    value: /^[0-9+\-\s()]*$/,
-                    message: "Invalid telephone number",
-                  },
-                })}
-              />
-              {errors.phone && (
-                <p className="error-msg mt-1">{errors.phone.message}</p>
+                  <div className="mt-2">
+                    <p className="text-base font-medium">
+                      <span>Map Coordinate</span>
+                      <span className="text-xs text-muted-foreground font-light">
+                        {" (Required for map marker)"}
+                      </span>
+                    </p>
+                    <div className="grid grid-cols-2 gap-5">
+                      <div>
+                        <Label
+                          htmlFor="latitude"
+                          className="text-xs text-muted-foreground"
+                        >
+                          Latitude
+                        </Label>
+                        <Input
+                          id="latitude"
+                          placeholder="eg. 13.7563..."
+                          {...register("latitude", {
+                            required: "Latitude is required",
+                            pattern: {
+                              value: /^-?([0-8]?\d|90)(\.\d+)?$/,
+                              message: "Invalid latitude",
+                            },
+                          })}
+                        />
+                        {errors.latitude && (
+                          <p className="error-msg mt-1">
+                            {errors.latitude.message}
+                          </p>
+                        )}
+                      </div>
+                      <div>
+                        <Label
+                          htmlFor="longitude"
+                          className="text-xs text-muted-foreground"
+                        >
+                          Longitude
+                        </Label>
+                        <Input
+                          id="longitude"
+                          placeholder="eg. 100.565..."
+                          {...register("longitude", {
+                            required: "Longitude is required",
+                            pattern: {
+                              value: /^-?(\d{1,2}|1[0-7]\d|180)(\.\d+)?$/,
+                              message: "Invalid longitude",
+                            },
+                          })}
+                        />
+                        {errors.longitude && (
+                          <p className="error-msg mt-1">
+                            {errors.longitude.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </>
               )}
+              <div>
+                <Label htmlFor="telephone">Telephone</Label>
+                <Input
+                  id="telephone"
+                  placeholder="0811234567"
+                  {...register("phone", {
+                    required: "Telephone is required",
+                    pattern: {
+                      value: /^[0-9+\-\s()]*$/,
+                      message: "Invalid telephone number",
+                    },
+                  })}
+                />
+                {errors.phone && (
+                  <p className="error-msg mt-1">{errors.phone.message}</p>
+                )}
+              </div>
             </div>
 
             <div>
